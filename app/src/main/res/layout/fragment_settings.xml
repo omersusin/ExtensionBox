@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="PERMISSIONS"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvSettingsTier"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:layout_marginBottom="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBatteryOpt"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="🔋 Request Battery Exemption"
+            android:textAllCaps="false"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DATA"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnResetDaily"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="↺ Reset Daily Stats"
+            android:textAllCaps="false"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_marginBottom="8dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnResetAll"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="⚠ Reset All Data"
+            android:textAllCaps="false"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ABOUT"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.15"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Extension Box v1.0\nOpen Source\n\nDisabled extension = zero resource usage"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:lineSpacingExtra="4dp"
+            android:layout_marginBottom="32dp" />
+
+    </LinearLayout>
+</ScrollView>

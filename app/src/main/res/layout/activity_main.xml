@@ -1,102 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp">
+        app:menu="@menu/bottom_nav" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:text="⚡ Extension Box"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Modular System Monitor"
-            android:textSize="13sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="12dp"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/tvTier"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="2dp"
-            android:textSize="12sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnToggle"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="16dp"
-            android:textAllCaps="false"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:layout_marginBottom="8dp"
-            android:text="EXTENSIONS"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.15"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-
-        <!-- 1. Battery -->
-        <include layout="@layout/item_ext" android:id="@+id/extBattery" />
-        <!-- 2. CPU & RAM -->
-        <include layout="@layout/item_ext" android:id="@+id/extCpuRam" />
-        <!-- 3. Screen Time -->
-        <include layout="@layout/item_ext" android:id="@+id/extScreen" />
-        <!-- 4. Deep Sleep -->
-        <include layout="@layout/item_ext" android:id="@+id/extSleep" />
-        <!-- 5. Network Speed -->
-        <include layout="@layout/item_ext" android:id="@+id/extNetwork" />
-        <!-- 6. Data Usage -->
-        <include layout="@layout/item_ext" android:id="@+id/extData" />
-        <!-- 7. Unlock Counter -->
-        <include layout="@layout/item_ext" android:id="@+id/extUnlock" />
-        <!-- 8. Storage -->
-        <include layout="@layout/item_ext" android:id="@+id/extStorage" />
-        <!-- 9. Connection Info -->
-        <include layout="@layout/item_ext" android:id="@+id/extConnection" />
-        <!-- 10. Uptime -->
-        <include layout="@layout/item_ext" android:id="@+id/extUptime" />
-        <!-- 11. Step Counter -->
-        <include layout="@layout/item_ext" android:id="@+id/extSteps" />
-        <!-- 12. Speed Test -->
-        <include layout="@layout/item_ext" android:id="@+id/extSpeedTest" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center"
-            android:text="Disabled extension = zero resource usage\nSprint 2 • v1.0"
-            android:textSize="11sp"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-
-    </LinearLayout>
-</ScrollView>
+</LinearLayout>
