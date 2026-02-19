@@ -3,42 +3,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="?attr/colorSurface"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="24dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="⚡ Extension Box"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        android:text="Extension Box"
+        android:textSize="28sp"
+        android:fontFamily="sans-serif-medium"
         android:textColor="?attr/colorOnSurface"
-        android:layout_marginTop="8dp" />
+        android:layout_marginBottom="4dp" />
 
     <TextView
         android:id="@+id/tvDashStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="4dp"
-        android:textSize="13sp" />
+        android:textSize="14sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="16dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnDashToggle"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="4dp"
-        android:textAllCaps="false" />
+        android:layout_height="56dp"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hold &amp; drag to reorder cards"
-        android:textSize="11sp"
-        android:alpha="0.5"
-        android:gravity="center"
-        android:layout_marginBottom="8dp" />
+        android:text="Hold and drag to reorder cards"
+        android:textSize="12sp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:layout_marginBottom="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dashRecycler"
@@ -46,6 +47,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="16dp" />
+        android:paddingBottom="24dp" />
 
 </LinearLayout>

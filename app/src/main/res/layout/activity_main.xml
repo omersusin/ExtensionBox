@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/colorSurface">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
@@ -15,6 +16,12 @@
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:backgroundTint="?attr/colorSurface"
+        android:elevation="12dp"
+        app:itemIconSize="24dp"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav" />
 
 </LinearLayout>

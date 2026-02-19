@@ -1,95 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="32dp">
 
+        <!-- PERMISSIONS -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="PERMISSIONS"
-            android:textSize="12sp"
+            android:text="Permissions"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:letterSpacing="0.15"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:id="@+id/tvSettingsTier"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="15sp"
-            android:layout_marginBottom="12dp" />
+            android:textColor="?attr/colorOnSurface"
+            android:layout_marginBottom="16dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnBatteryOpt"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
             android:text="🔋 Request Battery Exemption"
             android:textAllCaps="false"
             style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="32dp" />
 
+        <!-- DATA -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="DATA"
-            android:textSize="12sp"
+            android:text="Data"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:letterSpacing="0.15"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnResetDaily"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
             android:text="↺ Reset Daily Stats"
             android:textAllCaps="false"
             style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnResetAll"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
             android:text="⚠ Reset All Data"
             android:textAllCaps="false"
             style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="32dp" />
 
+        <!-- TRANSLATION -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TRANSLATION"
-            android:textSize="12sp"
+            android:text="Translation"
+            android:textSize="14sp"
             android:textStyle="bold"
-            android:letterSpacing="0.15"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Help translate Extension Box into your language! Export the template, translate all strings, and submit a Pull Request on GitHub. Your name and profile will be added to the Contributors section."
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:lineSpacingExtra="3dp"
-            android:layout_marginBottom="8dp" />
+            android:lineSpacingExtra="5dp"
+            android:layout_marginBottom="16dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnExportStrings"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="52dp"
             android:text="🌐 Export strings.xml for Translation"
             android:textAllCaps="false"
             style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="8dp" />
 
     </LinearLayout>
 </ScrollView>
