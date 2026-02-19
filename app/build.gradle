@@ -3,7 +3,8 @@ plugins {
 }
 
 
-def hasSigning = System.getenv("KEYSTORE_PATH") != null
+def ks = System.getenv("KEYSTORE_PATH")
+def hasSigning = ks != null && !ks.isEmpty()
 
 android {
     signingConfigs {

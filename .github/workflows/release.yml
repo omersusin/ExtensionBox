@@ -26,25 +26,30 @@ jobs:
         with:
           gradle-version: '8.7'
 
-      - name: Decode keystore
-        run: |
-          echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > app/release.jks
-
-      - name: Build Release APK
+      - name: Build Release (signed if secrets exist)
         env:
-          KEYSTORE_PATH: app/release.jks
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: gradle assembleRelease
+        run: |
+          set -eux
+          if [ -n "${KEYSTORE_B64:-}" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > app/release.jks
+            export KEYSTORE_PATH="app/release.jks"
+          fi
+          gradle assembleRelease
+          ls -lah app/build/outputs/apk/release || true
+          APK="$(ls -1 app/build/outputs/apk/release/*.apk | head -n 1)"
+          cp "$APK" "ExtensionBox-${GITHUB_REF_NAME}.apk"
 
-      - name: Upload Release APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ExtensionBox-release
-          path: app/build/outputs/apk/release/app-release.apk
+          name: ExtensionBox-${{ github.ref_name }}
+          path: ExtensionBox-${{ github.ref_name }}.apk
 
-      - name: Create GitHub Release
+      - name: Attach APK to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: app/build/outputs/apk/release/app-release.apk
+          files: ExtensionBox-${{ github.ref_name }}.apk
