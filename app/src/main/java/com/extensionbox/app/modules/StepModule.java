@@ -1,6 +1,9 @@
 package com.extensionbox.app.modules;
 
 import android.app.NotificationManager;
+import androidx.core.content.ContextCompat;
+import android.content.pm.PackageManager;
+import android.Manifest;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
