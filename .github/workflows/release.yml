@@ -21,14 +21,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-
       - name: Decode keystore
         run: |
-          echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > release.jks
+          mkdir -p app
+          echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > app/release.jks
+          ls -lh app/release.jks
 
       - name: Build Release APK
         env:
