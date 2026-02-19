@@ -23,19 +23,11 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             android:layout_marginBottom="16dp" />
 
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
+            android:id="@+id/extContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.Material3.CardView.Elevated">
-
-            <LinearLayout
-                android:id="@+id/extContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp" />
-
-        </com.google.android.material.card.MaterialCardView>
+            android:orientation="vertical" />
 
     </LinearLayout>
 </ScrollView>

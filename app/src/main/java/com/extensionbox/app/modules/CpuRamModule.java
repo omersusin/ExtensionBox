@@ -19,18 +19,21 @@ import java.util.Locale;
 
 public class CpuRamModule implements Module {
     private Context ctx;
+    private SystemAccess sys;
     private boolean running = false;
 
     private long[] prevCpuTimes;
     private float cpuUsage = -1f;
+    private float cpuTemp = Float.NaN;
     private long ramUsed, ramTotal, ramAvail;
 
     @Override public String key() { return "cpu_ram"; }
     @Override public String name() { return "CPU & RAM"; }
     @Override public String emoji() { return "🧠"; }
-    @Override public String description() { return "CPU usage, memory status"; }
+    @Override public String description() { return "CPU usage, temperature, memory status"; }
     @Override public boolean defaultEnabled() { return true; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 15; }
 
     @Override
     public int tickIntervalMs() {
@@ -38,8 +41,9 @@ public class CpuRamModule implements Module {
     }
 
     @Override
-    public void start(Context c, SystemAccess sys) {
+    public void start(Context c, SystemAccess s) {
         ctx = c;
+        sys = s;
         long[] a = readCpuTimes();
         if (a != null) {
             SystemClock.sleep(250);
@@ -50,21 +54,35 @@ public class CpuRamModule implements Module {
         } else {
             prevCpuTimes = null;
         }
+
+        // Initial CPU temp read
+        if (sys != null) {
+            cpuTemp = sys.readCpuTemp();
+        }
+
         running = true;
     }
 
     @Override
     public void stop() {
         running = false;
+        sys = null;
     }
 
     @Override
     public void tick() {
+        // CPU usage from /proc/stat
         long[] current = readCpuTimes();
         float u = calcCpuUsage(prevCpuTimes, current);
         if (u >= 0f) cpuUsage = u;
         if (current != null) prevCpuTimes = current;
 
+        // CPU temperature via SystemAccess
+        if (sys != null) {
+            cpuTemp = sys.readCpuTemp();
+        }
+
+        // RAM info
         try {
             ActivityManager am = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
             ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
@@ -117,15 +135,28 @@ public class CpuRamModule implements Module {
     @Override
     public String compact() {
         float ramPct = ramTotal > 0 ? ramUsed * 100f / ramTotal : 0;
-        return cpuUsage < 0f ? String.format(Locale.US, "CPU:-- RAM:%.0f%%", ramPct) : String.format(Locale.US, "CPU:%.1f%% RAM:%.0f%%", cpuUsage, ramPct);
+        String cpuStr = cpuUsage < 0f ? "--" : String.format(Locale.US, "%.0f%%", cpuUsage);
+        String tempStr = !Float.isNaN(cpuTemp) ? " " + Fmt.temp(cpuTemp) : "";
+        return String.format(Locale.US, "CPU:%s%s RAM:%.0f%%", cpuStr, tempStr, ramPct);
     }
 
     @Override
     public String detail() {
         float ramPct = ramTotal > 0 ? ramUsed * 100f / ramTotal : 0;
-        return String.format(Locale.US,
-                "🧠 CPU: %s\n   RAM: %s / %s (%.0f%%)\n   Available: %s",
-                (cpuUsage < 0f ? "--" : String.format(Locale.US, "%.1f%%", cpuUsage)), Fmt.bytes(ramUsed), Fmt.bytes(ramTotal), ramPct, Fmt.bytes(ramAvail));
+        StringBuilder sb = new StringBuilder();
+
+        String cpuStr = cpuUsage < 0f ? "--" : String.format(Locale.US, "%.1f%%", cpuUsage);
+        sb.append("🧠 CPU: ").append(cpuStr);
+
+        if (!Float.isNaN(cpuTemp)) {
+            sb.append(" • ").append(Fmt.temp(cpuTemp));
+        }
+
+        sb.append(String.format(Locale.US,
+                "\n   RAM: %s / %s (%.0f%%)\n   Available: %s",
+                Fmt.bytes(ramUsed), Fmt.bytes(ramTotal), ramPct, Fmt.bytes(ramAvail)));
+
+        return sb.toString();
     }
 
     @Override
@@ -133,6 +164,7 @@ public class CpuRamModule implements Module {
         LinkedHashMap<String, String> d = new LinkedHashMap<>();
         float ramPct = ramTotal > 0 ? ramUsed * 100f / ramTotal : 0;
         d.put("cpu.usage", cpuUsage < 0f ? "N/A" : String.format(Locale.US, "%.1f%%", cpuUsage));
+        d.put("cpu.temp", !Float.isNaN(cpuTemp) ? Fmt.temp(cpuTemp) : "—");
         d.put("ram.used", Fmt.bytes(ramUsed));
         d.put("ram.total", Fmt.bytes(ramTotal));
         d.put("ram.available", Fmt.bytes(ramAvail));

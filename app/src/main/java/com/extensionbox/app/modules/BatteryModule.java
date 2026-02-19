@@ -28,12 +28,20 @@ public class BatteryModule implements Module {
     private int designCap = 4000;
     private int currentMa = 0;
 
+    // Enhanced tier data
+    private int actualCap = -1;
+    private int cycleCount = -1;
+    private int realHealthPct = -1;
+    private String technology = null;
+    private float cpuTemp = Float.NaN;
+
     @Override public String key() { return "battery"; }
     @Override public String name() { return "Battery"; }
     @Override public String emoji() { return "🔋"; }
     @Override public String description() { return "Current, power, temperature, health"; }
     @Override public boolean defaultEnabled() { return true; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 10; }
 
     @Override
     public int tickIntervalMs() {
@@ -85,6 +93,18 @@ public class BatteryModule implements Module {
     public void tick() {
         if (sys != null && ctx != null) {
             currentMa = sys.readBatteryCurrentMa(ctx);
+
+            // Enhanced tier data (silently returns -1 / null if unavailable)
+            actualCap = sys.readActualCapacity();
+            cycleCount = sys.readCycleCount();
+            realHealthPct = sys.readRealHealthPct(ctx);
+            technology = sys.readBatteryTechnology();
+            cpuTemp = sys.readCpuTemp();
+
+            // Use actual capacity for time estimates if available
+            if (actualCap > 0) {
+                designCap = actualCap;
+            }
         }
     }
 
@@ -100,12 +120,38 @@ public class BatteryModule implements Module {
         float t = temp / 10f;
 
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Locale.US,
-                "🔋 %d%% • %dmA (%.1fW) • %s\n", level, ma, w, Fmt.temp(t)));
-        sb.append(String.format(Locale.US,
-                "   Health: %s • %.2fV • %s\n", healthStr(), voltage / 1000f, statusStr()));
-        sb.append("   ").append(timeLeft());
 
+        // Line 1: level, current, power, temp
+        if (sys != null && sys.isEnhanced() && !Float.isNaN(cpuTemp)) {
+            sb.append(String.format(Locale.US,
+                    "🔋 %d%% • %dmA (%.1fW) • %s • CPU: %s\n",
+                    level, ma, w, Fmt.temp(t), Fmt.temp(cpuTemp)));
+        } else {
+            sb.append(String.format(Locale.US,
+                    "🔋 %d%% • %dmA (%.1fW) • %s\n", level, ma, w, Fmt.temp(t)));
+        }
+
+        // Line 2: health info
+        if (sys != null && sys.isEnhanced() && realHealthPct > 0 && cycleCount >= 0) {
+            sb.append(String.format(Locale.US,
+                    "   Health: %d%% (%s/%s mAh) • %d cycles\n",
+                    realHealthPct,
+                    actualCap > 0 ? String.valueOf(actualCap) : "—",
+                    String.valueOf(sys.readDesignCapacity(ctx)),
+                    cycleCount));
+        } else {
+            sb.append(String.format(Locale.US,
+                    "   Health: %s • %.2fV • %s\n", healthStr(), voltage / 1000f, statusStr()));
+        }
+
+        // Line 3: voltage, technology, status (enhanced) or time left (normal)
+        if (sys != null && sys.isEnhanced() && technology != null) {
+            sb.append(String.format(Locale.US,
+                    "   %.2fV • %s • %s\n", voltage / 1000f, technology, statusStr()));
+        }
+
+        // Line 4: time left + charge type
+        sb.append("   ").append(timeLeft());
         if (isCharging()) {
             sb.append(" • ").append(chargeType());
         }
@@ -133,7 +179,15 @@ public class BatteryModule implements Module {
             d.put("battery.charge_type", chargeType());
         }
 
-        d.put("battery.design_cap", designCap + " mAh");
+        d.put("battery.design_cap", sys != null ? sys.readDesignCapacity(ctx) + " mAh" : designCap + " mAh");
+
+        // Enhanced tier data points
+        d.put("battery.technology", technology != null ? technology : "—");
+        d.put("battery.cycle_count", cycleCount >= 0 ? String.valueOf(cycleCount) : "—");
+        d.put("battery.real_health_pct", realHealthPct > 0 ? realHealthPct + "%" : "—");
+        d.put("battery.actual_cap", actualCap > 0 ? actualCap + " mAh" : "—");
+        d.put("battery.cpu_temp", !Float.isNaN(cpuTemp) ? Fmt.temp(cpuTemp) : "—");
+
         return d;
     }
 
@@ -181,12 +235,15 @@ public class BatteryModule implements Module {
         int ma = Math.abs(currentMa);
         if (ma < 5) return "—";
 
+        // Use actual capacity if available from enhanced tier
+        int cap = (actualCap > 0) ? actualCap : designCap;
+
         if (isCharging()) {
-            float neededMah = (100 - level) / 100f * designCap;
+            float neededMah = (100 - level) / 100f * cap;
             float hrs = neededMah / ma;
             return "⚡Full in " + formatHours(hrs);
         } else {
-            float remMah = level / 100f * designCap;
+            float remMah = level / 100f * cap;
             float hrs = remMah / ma;
             return formatHours(hrs) + " left";
         }

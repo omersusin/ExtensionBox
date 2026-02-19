@@ -30,6 +30,7 @@ public class UnlockModule implements Module {
     @Override public String description() { return "Daily unlocks, detox tracking"; }
     @Override public boolean defaultEnabled() { return true; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 60; }
 
     @Override
     public int tickIntervalMs() {

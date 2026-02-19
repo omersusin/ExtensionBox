@@ -49,6 +49,7 @@ public class SpeedTestModule implements Module {
     @Override public String description() { return "Periodic download/upload speed test"; }
     @Override public boolean defaultEnabled() { return false; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 80; }
 
     @Override
     public int tickIntervalMs() {

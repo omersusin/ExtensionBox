@@ -24,7 +24,7 @@ import com.extensionbox.app.Prefs;
 import com.extensionbox.app.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.color.MaterialColors;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -214,14 +214,10 @@ public class DashboardFragment extends Fragment {
             lp.bottomMargin = dp(10);
             card.setLayoutParams(lp);
 
-            // Visual polish
-            card.setCardElevation(dp(1));
-            card.setRadius(dp(18));
-            card.setStrokeWidth(dp(1));
-            int outline = MaterialColors.getColor(card, com.google.android.material.R.attr.colorOutline);
-            int surface = MaterialColors.getColor(card, com.google.android.material.R.attr.colorSurface);
-            card.setStrokeColor(outline);
-            card.setCardBackgroundColor(surface);
+            // Visual polish — match Extensions/Settings card style
+            card.setCardElevation(0);
+            card.setRadius(dp(16));
+            card.setStrokeWidth(0);
 
             card.setContentPadding(dp(16), dp(14), dp(16), dp(14));
             return new VH(card);
@@ -311,6 +307,51 @@ public class DashboardFragment extends Fragment {
                 }
             }
 
+            // "vs yesterday" comparison footer
+            String ydText = getYesterdayComparison(item.key);
+            if (ydText != null) {
+                TextView ydTv = new TextView(requireContext());
+                ydTv.setText(ydText);
+                ydTv.setTextSize(12);
+                ydTv.setAlpha(0.6f);
+                ydTv.setPadding(0, dp(8), 0, 0);
+                inner.addView(ydTv);
+            }
+
+            // Fap Counter: +1 button on dashboard
+            if ("fap".equals(item.key)) {
+                MaterialButton fapBtn = new MaterialButton(requireContext(),
+                        null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+                LinearLayout.LayoutParams btnLp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, dp(40));
+                btnLp.topMargin = dp(8);
+                fapBtn.setLayoutParams(btnLp);
+                fapBtn.setText("🍆 +1");
+                fapBtn.setTextSize(14);
+                fapBtn.setAllCaps(false);
+                fapBtn.setOnClickListener(fv -> {
+                    // Increment via MonitorService's FapCounterModule
+                    MonitorService svc = MonitorService.getInstance();
+                    if (svc != null) {
+                        com.extensionbox.app.modules.FapCounterModule fapMod = svc.getFapModule();
+                        if (fapMod != null) {
+                            fapMod.increment();
+                            refresh(); // immediate update
+                        }
+                    } else {
+                        // Fallback: increment directly in prefs
+                        int t = Prefs.getInt(requireContext(), "fap_today", 0) + 1;
+                        Prefs.setInt(requireContext(), "fap_today", t);
+                        int at = Prefs.getInt(requireContext(), "fap_all_time", 0) + 1;
+                        Prefs.setInt(requireContext(), "fap_all_time", at);
+                        int mo = Prefs.getInt(requireContext(), "fap_monthly", 0) + 1;
+                        Prefs.setInt(requireContext(), "fap_monthly", mo);
+                        refresh();
+                    }
+                });
+                inner.addView(fapBtn);
+            }
+
             card.addView(inner);
         }
 
@@ -322,6 +363,46 @@ public class DashboardFragment extends Fragment {
         class VH extends RecyclerView.ViewHolder {
             VH(@NonNull View v) { super(v); }
         }
+    }
+
+    private String getYesterdayComparison(String key) {
+        if (!isAdded() || getContext() == null) return null;
+        switch (key) {
+            case "unlock": {
+                int today = Prefs.getInt(requireContext(), "ulk_today", 0);
+                int yd = Prefs.getInt(requireContext(), "ulk_yesterday", 0);
+                if (yd > 0) return buildCompareText("unlocks", today, yd);
+                break;
+            }
+            case "screen": {
+                long today = Prefs.getLong(requireContext(), "scr_on_acc", 0) / 60000;
+                long yd = Prefs.getLong(requireContext(), "scr_yesterday_on", 0) / 60000;
+                if (yd > 0) return buildCompareText("screen time (min)", (int) today, (int) yd);
+                break;
+            }
+            case "steps": {
+                long today = Prefs.getLong(requireContext(), "stp_today", 0);
+                long yd = Prefs.getLong(requireContext(), "stp_yesterday", 0);
+                if (yd > 0) return buildCompareText("steps", (int) today, (int) yd);
+                break;
+            }
+            case "fap": {
+                int today = Prefs.getInt(requireContext(), "fap_today", 0);
+                int yd = Prefs.getInt(requireContext(), "fap_yesterday", 0);
+                if (yd > 0) return buildCompareText("count", today, yd);
+                break;
+            }
+        }
+        return null;
+    }
+
+    private String buildCompareText(String label, int today, int yesterday) {
+        if (yesterday == 0) return null;
+        int diff = today - yesterday;
+        int pct = Math.abs(diff * 100 / yesterday);
+        if (diff < 0) return "↓ " + pct + "% less " + label + " than yesterday 🎉";
+        if (diff > 0) return "↑ " + pct + "% more " + label + " than yesterday";
+        return "Same " + label + " as yesterday";
     }
 
     private int dp(int v) {

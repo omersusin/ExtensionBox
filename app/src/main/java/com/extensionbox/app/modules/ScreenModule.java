@@ -37,6 +37,7 @@ public class ScreenModule implements Module {
     @Override public String description() { return "Screen on/off time, drain rates"; }
     @Override public boolean defaultEnabled() { return true; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 20; }
 
     @Override
     public int tickIntervalMs() {

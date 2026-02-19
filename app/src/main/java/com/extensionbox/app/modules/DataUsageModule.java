@@ -29,6 +29,7 @@ public class DataUsageModule implements Module {
     @Override public String description() { return "Daily & monthly, WiFi & mobile"; }
     @Override public boolean defaultEnabled() { return true; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 50; }
 
     @Override
     public int tickIntervalMs() {

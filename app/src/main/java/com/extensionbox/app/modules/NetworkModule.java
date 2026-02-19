@@ -30,6 +30,7 @@ public class NetworkModule implements Module {
     @Override public String description() { return "Real-time download and upload speed"; }
     @Override public boolean defaultEnabled() { return true; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 40; }
 
     @Override
     public int tickIntervalMs() {

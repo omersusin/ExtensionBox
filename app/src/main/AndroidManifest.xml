@@ -8,8 +8,12 @@
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-
-    <!-- Permissions (gerekliyse buraya tam isimleriyle eklenir) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".ExtensionBoxApp"
@@ -39,7 +43,6 @@
                 android:value="System monitoring" />
         </service>
 
-    
         <receiver
             android:name=".BootReceiver"
             android:exported="true">
@@ -48,6 +51,138 @@
             </intent-filter>
         </receiver>
 
+        <!-- ═══ Module Widgets ═══ -->
+        <receiver android:name=".widgets.ModuleWidgetProvider$BatteryWidgetProvider"
+            android:exported="true"
+            android:label="🔋 Battery">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_battery_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$CpuRamWidgetProvider"
+            android:exported="true"
+            android:label="🧠 CPU &amp; RAM">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_cpuram_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$ScreenWidgetProvider"
+            android:exported="true"
+            android:label="📱 Screen Time">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_screen_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$SleepWidgetProvider"
+            android:exported="true"
+            android:label="😴 Deep Sleep">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_sleep_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$NetworkWidgetProvider"
+            android:exported="true"
+            android:label="📶 Network Speed">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_network_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$DataWidgetProvider"
+            android:exported="true"
+            android:label="📊 Data Usage">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_data_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$UnlockWidgetProvider"
+            android:exported="true"
+            android:label="🔓 Unlock Counter">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_unlock_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$StorageWidgetProvider"
+            android:exported="true"
+            android:label="💾 Storage">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_storage_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$ConnectionWidgetProvider"
+            android:exported="true"
+            android:label="📡 Connection Info">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_connection_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$UptimeWidgetProvider"
+            android:exported="true"
+            android:label="🕒 Uptime">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_uptime_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$StepWidgetProvider"
+            android:exported="true"
+            android:label="👣 Step Counter">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_step_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$SpeedTestWidgetProvider"
+            android:exported="true"
+            android:label="🏎 Speed Test">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_speedtest_info" />
+        </receiver>
+
+        <receiver android:name=".widgets.ModuleWidgetProvider$FapWidgetProvider"
+            android:exported="true"
+            android:label="🍆 Fap Counter">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_fap_info" />
+        </receiver>
+
     </application>
+
 
 </manifest>

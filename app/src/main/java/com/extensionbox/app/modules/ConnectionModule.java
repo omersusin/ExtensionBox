@@ -28,6 +28,7 @@ public class ConnectionModule implements Module {
     @Override public String description() { return "WiFi, cellular, VPN status"; }
     @Override public boolean defaultEnabled() { return false; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 90; }
 
     @Override
     public int tickIntervalMs() {

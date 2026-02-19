@@ -19,4 +19,10 @@ public interface Module {
     LinkedHashMap<String, String> dataPoints();
     boolean alive();
     void checkAlerts(Context ctx);
+
+    /**
+     * Priority for notification ordering. Lower = higher priority.
+     * Battery=10, Screen=20, Sleep=30, Network=40, Data=50, Unlock=60, Steps=70, SpeedTest=80, etc.
+     */
+    int priority();
 }

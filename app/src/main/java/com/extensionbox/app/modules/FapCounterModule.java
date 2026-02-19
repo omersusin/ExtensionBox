@@ -24,6 +24,7 @@ public class FapCounterModule implements Module {
     @Override public String description() { return "Self-monitoring counter & streak tracker"; }
     @Override public boolean defaultEnabled() { return false; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 100; }
 
     @Override
     public int tickIntervalMs() {

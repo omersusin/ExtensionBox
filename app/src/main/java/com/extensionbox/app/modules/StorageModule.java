@@ -27,6 +27,7 @@ public class StorageModule implements Module {
     @Override public String description() { return "Internal storage usage"; }
     @Override public boolean defaultEnabled() { return false; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 85; }
 
     @Override
     public int tickIntervalMs() {

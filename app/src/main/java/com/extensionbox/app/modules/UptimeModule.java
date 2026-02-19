@@ -24,6 +24,7 @@ public class UptimeModule implements Module {
     @Override public String description() { return "Device uptime since boot"; }
     @Override public boolean defaultEnabled() { return false; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 95; }
 
     @Override
     public int tickIntervalMs() {

@@ -22,6 +22,7 @@ public class SleepModule implements Module {
     @Override public String description() { return "CPU sleep vs awake ratio"; }
     @Override public boolean defaultEnabled() { return true; }
     @Override public boolean alive() { return running; }
+    @Override public int priority() { return 30; }
 
     @Override
     public int tickIntervalMs() {

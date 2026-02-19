@@ -40,10 +40,11 @@
 
         <!-- Version -->
         <TextView
+            android:id="@+id/tvAboutVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="v1.0 Sprint 4"
+            android:text="v0.2.4"
             android:textSize="14sp"
             android:textColor="?attr/colorOnSurfaceVariant" />
 

@@ -1,4 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="ic_launcher_background">#00000000</color>
+    <color name="ic_launcher_background">#00000000</color>
+
+    <!-- ═══ Gruvbox Dark ═══ -->
+    <color name="gruvbox_bg">#282828</color>
+    <color name="gruvbox_surface">#3C3836</color>
+    <color name="gruvbox_primary">#D79921</color>
+    <color name="gruvbox_on_primary">#282828</color>
+    <color name="gruvbox_secondary">#689D6A</color>
+    <color name="gruvbox_on_surface">#EBDBB2</color>
+    <color name="gruvbox_on_surface_variant">#A89984</color>
+    <color name="gruvbox_outline">#504945</color>
+    <color name="gruvbox_error">#CC241D</color>
+    <color name="gruvbox_surface_container">#32302F</color>
+
+    <!-- ═══ Catppuccin Mocha ═══ -->
+    <color name="ctp_bg">#1E1E2E</color>
+    <color name="ctp_surface">#313244</color>
+    <color name="ctp_primary">#CBA6F7</color>
+    <color name="ctp_on_primary">#1E1E2E</color>
+    <color name="ctp_secondary">#F5C2E7</color>
+    <color name="ctp_on_surface">#CDD6F4</color>
+    <color name="ctp_on_surface_variant">#A6ADC8</color>
+    <color name="ctp_outline">#585B70</color>
+    <color name="ctp_error">#F38BA8</color>
+    <color name="ctp_surface_container">#181825</color>
+
+    <!-- ═══ Nord ═══ -->
+    <color name="nord_bg">#2E3440</color>
+    <color name="nord_surface">#3B4252</color>
+    <color name="nord_primary">#88C0D0</color>
+    <color name="nord_on_primary">#2E3440</color>
+    <color name="nord_secondary">#81A1C1</color>
+    <color name="nord_on_surface">#ECEFF4</color>
+    <color name="nord_on_surface_variant">#D8DEE9</color>
+    <color name="nord_outline">#4C566A</color>
+    <color name="nord_error">#BF616A</color>
+    <color name="nord_surface_container">#2E3440</color>
+
+    <!-- ═══ AMOLED ═══ -->
+    <color name="amoled_bg">#000000</color>
+    <color name="amoled_surface">#0A0A0A</color>
+    <color name="amoled_primary">#00E676</color>
+    <color name="amoled_on_primary">#000000</color>
+    <color name="amoled_secondary">#76FF03</color>
+    <color name="amoled_on_surface">#FFFFFF</color>
+    <color name="amoled_on_surface_variant">#B0B0B0</color>
+    <color name="amoled_outline">#1A1A1A</color>
+    <color name="amoled_error">#FF5252</color>
+    <color name="amoled_surface_container">#050505</color>
+
+    <!-- ═══ Solarized Dark ═══ -->
+    <color name="solar_bg">#002B36</color>
+    <color name="solar_surface">#073642</color>
+    <color name="solar_primary">#B58900</color>
+    <color name="solar_on_primary">#002B36</color>
+    <color name="solar_secondary">#268BD2</color>
+    <color name="solar_on_surface">#FDF6E3</color>
+    <color name="solar_on_surface_variant">#93A1A1</color>
+    <color name="solar_outline">#586E75</color>
+    <color name="solar_error">#DC322F</color>
+    <color name="solar_surface_container">#002B36</color>
+
+    <!-- ═══ Dracula ═══ -->
+    <color name="dracula_bg">#282A36</color>
+    <color name="dracula_surface">#44475A</color>
+    <color name="dracula_primary">#BD93F9</color>
+    <color name="dracula_on_primary">#282A36</color>
+    <color name="dracula_secondary">#FF79C6</color>
+    <color name="dracula_on_surface">#F8F8F2</color>
+    <color name="dracula_on_surface_variant">#6272A4</color>
+    <color name="dracula_outline">#44475A</color>
+    <color name="dracula_error">#FF5555</color>
+    <color name="dracula_surface_container">#21222C</color>
 </resources>

@@ -1,5 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Default: Material You (Monet/DayNight) -->
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
     </style>
+
+    <!-- ═══ Gruvbox Dark ═══ -->
+    <style name="AppTheme.Gruvbox" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/gruvbox_primary</item>
+        <item name="colorOnPrimary">@color/gruvbox_on_primary</item>
+        <item name="colorSecondary">@color/gruvbox_secondary</item>
+        <item name="colorSurface">@color/gruvbox_bg</item>
+        <item name="colorOnSurface">@color/gruvbox_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/gruvbox_on_surface_variant</item>
+        <item name="colorSurfaceContainerHigh">@color/gruvbox_surface</item>
+        <item name="colorSurfaceContainer">@color/gruvbox_surface_container</item>
+        <item name="colorOutline">@color/gruvbox_outline</item>
+        <item name="colorError">@color/gruvbox_error</item>
+        <item name="android:windowBackground">@color/gruvbox_bg</item>
+        <item name="android:statusBarColor">@color/gruvbox_bg</item>
+        <item name="android:navigationBarColor">@color/gruvbox_surface_container</item>
+    </style>
+
+    <!-- ═══ Catppuccin Mocha ═══ -->
+    <style name="AppTheme.Catppuccin" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/ctp_primary</item>
+        <item name="colorOnPrimary">@color/ctp_on_primary</item>
+        <item name="colorSecondary">@color/ctp_secondary</item>
+        <item name="colorSurface">@color/ctp_bg</item>
+        <item name="colorOnSurface">@color/ctp_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/ctp_on_surface_variant</item>
+        <item name="colorSurfaceContainerHigh">@color/ctp_surface</item>
+        <item name="colorSurfaceContainer">@color/ctp_surface_container</item>
+        <item name="colorOutline">@color/ctp_outline</item>
+        <item name="colorError">@color/ctp_error</item>
+        <item name="android:windowBackground">@color/ctp_bg</item>
+        <item name="android:statusBarColor">@color/ctp_bg</item>
+        <item name="android:navigationBarColor">@color/ctp_surface_container</item>
+    </style>
+
+    <!-- ═══ Nord ═══ -->
+    <style name="AppTheme.Nord" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/nord_primary</item>
+        <item name="colorOnPrimary">@color/nord_on_primary</item>
+        <item name="colorSecondary">@color/nord_secondary</item>
+        <item name="colorSurface">@color/nord_bg</item>
+        <item name="colorOnSurface">@color/nord_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/nord_on_surface_variant</item>
+        <item name="colorSurfaceContainerHigh">@color/nord_surface</item>
+        <item name="colorSurfaceContainer">@color/nord_surface_container</item>
+        <item name="colorOutline">@color/nord_outline</item>
+        <item name="colorError">@color/nord_error</item>
+        <item name="android:windowBackground">@color/nord_bg</item>
+        <item name="android:statusBarColor">@color/nord_bg</item>
+        <item name="android:navigationBarColor">@color/nord_surface_container</item>
+    </style>
+
+    <!-- ═══ AMOLED ═══ -->
+    <style name="AppTheme.Amoled" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/amoled_primary</item>
+        <item name="colorOnPrimary">@color/amoled_on_primary</item>
+        <item name="colorSecondary">@color/amoled_secondary</item>
+        <item name="colorSurface">@color/amoled_bg</item>
+        <item name="colorOnSurface">@color/amoled_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/amoled_on_surface_variant</item>
+        <item name="colorSurfaceContainerHigh">@color/amoled_surface</item>
+        <item name="colorSurfaceContainer">@color/amoled_surface_container</item>
+        <item name="colorOutline">@color/amoled_outline</item>
+        <item name="colorError">@color/amoled_error</item>
+        <item name="android:windowBackground">@color/amoled_bg</item>
+        <item name="android:statusBarColor">@color/amoled_bg</item>
+        <item name="android:navigationBarColor">@color/amoled_bg</item>
+    </style>
+
+    <!-- ═══ Solarized Dark ═══ -->
+    <style name="AppTheme.Solarized" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/solar_primary</item>
+        <item name="colorOnPrimary">@color/solar_on_primary</item>
+        <item name="colorSecondary">@color/solar_secondary</item>
+        <item name="colorSurface">@color/solar_bg</item>
+        <item name="colorOnSurface">@color/solar_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/solar_on_surface_variant</item>
+        <item name="colorSurfaceContainerHigh">@color/solar_surface</item>
+        <item name="colorSurfaceContainer">@color/solar_surface_container</item>
+        <item name="colorOutline">@color/solar_outline</item>
+        <item name="colorError">@color/solar_error</item>
+        <item name="android:windowBackground">@color/solar_bg</item>
+        <item name="android:statusBarColor">@color/solar_bg</item>
+        <item name="android:navigationBarColor">@color/solar_surface_container</item>
+    </style>
+
+    <!-- ═══ Dracula ═══ -->
+    <style name="AppTheme.Dracula" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/dracula_primary</item>
+        <item name="colorOnPrimary">@color/dracula_on_primary</item>
+        <item name="colorSecondary">@color/dracula_secondary</item>
+        <item name="colorSurface">@color/dracula_bg</item>
+        <item name="colorOnSurface">@color/dracula_on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/dracula_on_surface_variant</item>
+        <item name="colorSurfaceContainerHigh">@color/dracula_surface</item>
+        <item name="colorSurfaceContainer">@color/dracula_surface_container</item>
+        <item name="colorOutline">@color/dracula_outline</item>
+        <item name="colorError">@color/dracula_error</item>
+        <item name="android:windowBackground">@color/dracula_bg</item>
+        <item name="android:statusBarColor">@color/dracula_bg</item>
+        <item name="android:navigationBarColor">@color/dracula_surface_container</item>
+    </style>
+
 </resources>
