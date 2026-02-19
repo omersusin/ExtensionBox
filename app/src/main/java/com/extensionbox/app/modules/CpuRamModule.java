@@ -3,6 +3,7 @@ package com.extensionbox.app.modules;
 import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.SystemClock;
 
 import androidx.core.app.NotificationCompat;
 
@@ -21,7 +22,7 @@ public class CpuRamModule implements Module {
     private boolean running = false;
 
     private long[] prevCpuTimes;
-    private float cpuUsage = 0;
+    private float cpuUsage = -1f;
     private long ramUsed, ramTotal, ramAvail;
 
     @Override public String key() { return "cpu_ram"; }
@@ -39,7 +40,16 @@ public class CpuRamModule implements Module {
     @Override
     public void start(Context c, SystemAccess sys) {
         ctx = c;
-        prevCpuTimes = readCpuTimes();
+        long[] a = readCpuTimes();
+        if (a != null) {
+            SystemClock.sleep(250);
+            long[] b = readCpuTimes();
+            float u = calcCpuUsage(a, b);
+            if (u >= 0f) cpuUsage = u;
+            prevCpuTimes = b != null ? b : a;
+        } else {
+            prevCpuTimes = null;
+        }
         running = true;
     }
 
@@ -51,19 +61,9 @@ public class CpuRamModule implements Module {
     @Override
     public void tick() {
         long[] current = readCpuTimes();
-        if (prevCpuTimes != null && current != null) {
-            long prevIdle = prevCpuTimes[3] + prevCpuTimes[4];
-            long currIdle = current[3] + current[4];
-            long prevTotal = 0, currTotal = 0;
-            for (long v : prevCpuTimes) prevTotal += v;
-            for (long v : current) currTotal += v;
-            long totalDiff = currTotal - prevTotal;
-            long idleDiff = currIdle - prevIdle;
-            if (totalDiff > 0) {
-                cpuUsage = (totalDiff - idleDiff) * 100f / totalDiff;
-            }
-        }
-        prevCpuTimes = current;
+        float u = calcCpuUsage(prevCpuTimes, current);
+        if (u >= 0f) cpuUsage = u;
+        if (current != null) prevCpuTimes = current;
 
         try {
             ActivityManager am = (ActivityManager) ctx.getSystemService(Context.ACTIVITY_SERVICE);
@@ -73,6 +73,28 @@ public class CpuRamModule implements Module {
             ramAvail = mi.availMem;
             ramUsed = ramTotal - ramAvail;
         } catch (Exception ignored) {}
+    }
+
+    private static float calcCpuUsage(long[] prev, long[] curr) {
+        if (prev == null || curr == null) return -1f;
+        if (prev.length < 5 || curr.length < 5) return -1f;
+
+        long prevIdle = prev[3] + prev[4];
+        long currIdle = curr[3] + curr[4];
+
+        long prevTotal = 0, currTotal = 0;
+        for (long v : prev) prevTotal += v;
+        for (long v : curr) currTotal += v;
+
+        long totalDiff = currTotal - prevTotal;
+        long idleDiff = currIdle - prevIdle;
+
+        if (totalDiff <= 0) return -1f;
+
+        float usage = (totalDiff - idleDiff) * 100f / (float) totalDiff;
+        if (usage < 0f) usage = 0f;
+        if (usage > 100f) usage = 100f;
+        return usage;
     }
 
     private long[] readCpuTimes() {
@@ -95,22 +117,22 @@ public class CpuRamModule implements Module {
     @Override
     public String compact() {
         float ramPct = ramTotal > 0 ? ramUsed * 100f / ramTotal : 0;
-        return String.format(Locale.US, "CPU:%.0f%% RAM:%.0f%%", cpuUsage, ramPct);
+        return cpuUsage < 0f ? String.format(Locale.US, "CPU:-- RAM:%.0f%%", ramPct) : String.format(Locale.US, "CPU:%.1f%% RAM:%.0f%%", cpuUsage, ramPct);
     }
 
     @Override
     public String detail() {
         float ramPct = ramTotal > 0 ? ramUsed * 100f / ramTotal : 0;
         return String.format(Locale.US,
-                "🧠 CPU: %.1f%%\n   RAM: %s / %s (%.0f%%)\n   Available: %s",
-                cpuUsage, Fmt.bytes(ramUsed), Fmt.bytes(ramTotal), ramPct, Fmt.bytes(ramAvail));
+                "🧠 CPU: %s\n   RAM: %s / %s (%.0f%%)\n   Available: %s",
+                (cpuUsage < 0f ? "--" : String.format(Locale.US, "%.1f%%", cpuUsage)), Fmt.bytes(ramUsed), Fmt.bytes(ramTotal), ramPct, Fmt.bytes(ramAvail));
     }
 
     @Override
     public LinkedHashMap<String, String> dataPoints() {
         LinkedHashMap<String, String> d = new LinkedHashMap<>();
         float ramPct = ramTotal > 0 ? ramUsed * 100f / ramTotal : 0;
-        d.put("cpu.usage", String.format(Locale.US, "%.1f%%", cpuUsage));
+        d.put("cpu.usage", cpuUsage < 0f ? "N/A" : String.format(Locale.US, "%.1f%%", cpuUsage));
         d.put("ram.used", Fmt.bytes(ramUsed));
         d.put("ram.total", Fmt.bytes(ramTotal));
         d.put("ram.available", Fmt.bytes(ramAvail));
