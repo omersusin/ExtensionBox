@@ -18,71 +18,41 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: "17"
-          distribution: "temurin"
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.7"
+          gradle-version: '8.7'
 
-      - name: Prepare signing keystore
-        shell: bash
+      - name: Decode keystore
         run: |
-          set -euo pipefail
           mkdir -p app
-          if [[ -n "${KEYSTORE_B64:-}" ]]; then
-            echo "$KEYSTORE_B64" | base64 -d > app/release.jks
-            echo "USING_SECRETS=1" >> "$GITHUB_ENV"
-          else
-            keytool -genkeypair -v \
-              -keystore app/release.jks \
-              -storepass android -keypass android \
-              -alias release -keyalg RSA -keysize 2048 -validity 10000 \
-              -dname "CN=ExtensionBox,O=ExtensionBox,C=TR"
-            echo "USING_SECRETS=0" >> "$GITHUB_ENV"
-          fi
-        env:
-          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > app/release.jks
+          test -f app/release.jks
 
-      - name: Build Release APK (signed)
+      - name: Build Release APK
         env:
-          KEYSTORE_PATH: app/release.jks
+          KEYSTORE_PATH: ${{ github.workspace }}/app/release.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          USING_SECRETS: ${{ env.USING_SECRETS }}
-        shell: bash
         run: |
-          set -euo pipefail
-          if [[ "${USING_SECRETS}" == "1" ]]; then
-            : "${KEYSTORE_PASSWORD:?missing}"
-            : "${KEY_ALIAS:?missing}"
-            : "${KEY_PASSWORD:?missing}"
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+            ./gradlew assembleRelease
           else
-            export KEYSTORE_PASSWORD=android
-            export KEY_ALIAS=release
-            export KEY_PASSWORD=android
+            gradle assembleRelease
           fi
-          gradle assembleRelease
 
-      - name: Prepare artifact filename
-        shell: bash
-        run: |
-          set -euo pipefail
-          APK="app/build/outputs/apk/release/app-release.apk"
-          test -f "$APK"
-          NAME="ExtensionBox-${GITHUB_REF_NAME}.apk"
-          cp "$APK" "$NAME"
-          echo "OUT_APK=$NAME" >> "$GITHUB_ENV"
-
-      - name: Upload Release APK
+      - name: Upload Release APK (artifact)
         uses: actions/upload-artifact@v4
         with:
           name: ExtensionBox-release
-          path: ${{ env.OUT_APK }}
+          path: app/build/outputs/apk/release/app-release.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ env.OUT_APK }}
+          files: app/build/outputs/apk/release/app-release.apk
