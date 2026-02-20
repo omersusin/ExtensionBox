@@ -29,8 +29,15 @@ jobs:
       - name: Build release APK (unsigned)
         run: bash ./gradlew :app:assembleRelease --stacktrace
 
+      - name: Locate APK
+        run: |
+          ls -R app/build/outputs/apk || true
+          APK="$(find app/build/outputs/apk -type f -name '*.apk' | head -n 1)"
+          echo "APK=$APK" >> $GITHUB_ENV
+          test -n "$APK"
+
       - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk ExtensionBox-${{ github.ref_name }}.apk
+        run: cp "$APK" "ExtensionBox-${{ github.ref_name }}.apk"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
