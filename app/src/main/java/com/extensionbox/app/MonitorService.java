@@ -361,13 +361,38 @@ public class MonitorService extends Service {
         return lines.isEmpty() ? "Enable extensions from the app" : TextUtils.join("\n", lines);
     }
 
-    /** Returns alive modules sorted by priority (lower = higher priority). */
+    /** Returns alive modules sorted by dashboard order, then priority. */
     private List<Module> getAliveModulesSorted() {
         List<Module> alive = new ArrayList<>();
         for (Module m : modules) {
             if (m.alive()) alive.add(m);
         }
-        Collections.sort(alive, Comparator.comparingInt(Module::priority));
+
+        String saved = Prefs.getString(this, "dash_card_order", "");
+        if (saved.isEmpty()) {
+            // Fallback to priority sort if no custom order saved
+            Collections.sort(alive, Comparator.comparingInt(Module::priority));
+            return alive;
+        }
+
+        List<String> orderedKeys = new ArrayList<>();
+        String[] keys = saved.split(",");
+        for (String k : keys) {
+            if (!k.isEmpty()) orderedKeys.add(k);
+        }
+
+        Collections.sort(alive, (m1, m2) -> {
+            int idx1 = orderedKeys.indexOf(m1.key());
+            int idx2 = orderedKeys.indexOf(m2.key());
+
+            if (idx1 != -1 && idx2 != -1) return Integer.compare(idx1, idx2);
+            if (idx1 != -1) return -1;
+            if (idx2 != -1) return 1;
+
+            // Fallback to priority for modules not in saved order
+            return Integer.compare(m1.priority(), m2.priority());
+        });
+
         return alive;
     }
 
