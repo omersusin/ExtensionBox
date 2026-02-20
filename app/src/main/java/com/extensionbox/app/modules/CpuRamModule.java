@@ -53,6 +53,11 @@ public class CpuRamModule implements Module {
             prevCpuTimes = b != null ? b : a;
         } else {
             prevCpuTimes = null;
+            // Initial fallback for Normal tier
+            if (sys != null) {
+                float fb = sys.readCpuUsageFallback();
+                if (fb >= 0f) cpuUsage = fb;
+            }
         }
 
         // Initial CPU temp read
@@ -74,7 +79,14 @@ public class CpuRamModule implements Module {
         // CPU usage from /proc/stat
         long[] current = readCpuTimes();
         float u = calcCpuUsage(prevCpuTimes, current);
-        if (u >= 0f) cpuUsage = u;
+        if (u >= 0f) {
+            cpuUsage = u;
+        } else if (sys != null) {
+            // Fallback for Normal tier on Android 8+
+            float fb = sys.readCpuUsageFallback();
+            if (fb >= 0f) cpuUsage = fb;
+        }
+
         if (current != null) prevCpuTimes = current;
 
         // CPU temperature via SystemAccess
@@ -116,10 +128,9 @@ public class CpuRamModule implements Module {
     }
 
     private long[] readCpuTimes() {
+        if (sys == null) return null;
         try {
-            BufferedReader br = new BufferedReader(new FileReader("/proc/stat"));
-            String line = br.readLine();
-            br.close();
+            String line = sys.readSysFile("/proc/stat");
             if (line != null && line.startsWith("cpu ")) {
                 String[] parts = line.substring(4).trim().split("\\s+");
                 long[] times = new long[Math.min(parts.length, 7)];
