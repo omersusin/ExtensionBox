@@ -297,4 +297,80 @@ public class SystemAccess {
         int pct = actualCap * 100 / designCap;
         return (pct > 0 && pct <= 200) ? pct : -1;
     }
+
+    /**
+     * Fallback CPU usage reader for Normal tier on Android 8+.
+     * Uses 'top' command to get a snapshot.
+     */
+    public float readCpuUsageFallback() {
+        try {
+            // Run top command once
+            Process p = Runtime.getRuntime().exec(new String[]{"top", "-n", "1", "-b"});
+            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            // Common top headers:
+            // "User 4%, System 6%, IOW 0%, IRQ 0%"
+            // "400%cpu  20%user   0%nice  15%sys 360%idle..."
+            while ((line = br.readLine()) != null) {
+                line = line.toLowerCase(Locale.US);
+                if (line.contains("user") && line.contains("sys") && (line.contains("%") || line.contains("cpu"))) {
+                    float u = parseCpuFromTopLine(line);
+                    if (u >= 0) {
+                        br.close();
+                        p.destroy();
+                        return u;
+                    }
+                }
+            }
+            br.close();
+            p.destroy();
+        } catch (Exception ignored) {}
+        return -1f;
+    }
+
+    private float parseCpuFromTopLine(String line) {
+        try {
+            // Pattern 1: "User 4%, System 6%..."
+            if (line.contains("user") && line.contains("%")) {
+                float total = 0;
+                String[] parts = line.split(",");
+                for (String part : parts) {
+                    if (part.contains("user") || part.contains("sys") || part.contains("nice") || part.contains("irq")) {
+                        String num = part.replaceAll("[^0-9.]", "");
+                        if (!num.isEmpty()) total += Float.parseFloat(num);
+                    }
+                }
+                if (total > 0) return total;
+            }
+            // Pattern 2: "400%cpu  20%user   0%nice  15%sys..."
+            // Total = 400 - idle (if we can find idle)
+            if (line.contains("idle")) {
+                String[] words = line.trim().split("\\s+");
+                float idle = -1;
+                float total = -1;
+                for (String w : words) {
+                    if (w.contains("idle")) {
+                        String num = w.replaceAll("[^0-9.]", "");
+                        if (!num.isEmpty()) idle = Float.parseFloat(num);
+                    } else if (w.contains("cpu")) {
+                        String num = w.replaceAll("[^0-9.]", "");
+                        if (!num.isEmpty()) total = Float.parseFloat(num);
+                    }
+                }
+                if (total > 0 && idle >= 0) {
+                    float usage = (total - idle) * 100f / total;
+                    return Math.max(0, Math.min(100, usage));
+                }
+            }
+        } catch (Exception ignored) {}
+        return -1f;
+    }
+
+    public int getCpuCoreCount() {
+        try {
+            return Runtime.getRuntime().availableProcessors();
+        } catch (Exception e) {
+            return 1;
+        }
+    }
 }
