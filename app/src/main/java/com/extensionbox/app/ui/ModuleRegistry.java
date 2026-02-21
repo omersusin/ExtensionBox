@@ -16,6 +16,7 @@ public final class ModuleRegistry {
         {"steps",      "👣", "Step Counter",     "Steps and distance",                      "false"},
         {"speedtest",  "🏎", "Speed Test",       "Periodic download/upload speed test",     "false"},
         {"fap",        "🍆", "Fap Counter",      "Self-monitoring counter & streak",        "false"},
+        {"app_usage",  "📲", "App Usage",         "Daily per-app screen time",               "false"},
     };
 
     public static String keyAt(int i)     { return MODULES[i][0]; }
@@ -33,5 +34,25 @@ public final class ModuleRegistry {
     public static String nameFor(String key) {
         for (String[] m : MODULES) if (m[0].equals(key)) return m[2];
         return key;
+    }
+
+    public static int iconResFor(String key) {
+        switch (key) {
+            case "battery":    return com.extensionbox.app.R.drawable.ic_outline_battery;
+            case "cpu_ram":    return com.extensionbox.app.R.drawable.ic_outline_cpu_ram;
+            case "screen":     return com.extensionbox.app.R.drawable.ic_outline_screen;
+            case "sleep":      return com.extensionbox.app.R.drawable.ic_outline_sleep;
+            case "network":    return com.extensionbox.app.R.drawable.ic_outline_network;
+            case "data":       return com.extensionbox.app.R.drawable.ic_outline_data;
+            case "unlock":     return com.extensionbox.app.R.drawable.ic_outline_unlock;
+            case "storage":    return com.extensionbox.app.R.drawable.ic_outline_storage;
+            case "connection": return com.extensionbox.app.R.drawable.ic_outline_connection;
+            case "uptime":     return com.extensionbox.app.R.drawable.ic_outline_uptime;
+            case "steps":      return com.extensionbox.app.R.drawable.ic_outline_steps;
+            case "speedtest":  return com.extensionbox.app.R.drawable.ic_outline_speedtest;
+            case "fap":        return com.extensionbox.app.R.drawable.ic_outline_fap;
+            case "app_usage":  return com.extensionbox.app.R.drawable.ic_outline_screen;
+            default:           return com.extensionbox.app.R.drawable.ic_outline_info;
+        }
     }
 }

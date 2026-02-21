@@ -47,59 +47,47 @@ public class FapCounterModule implements Module {
         checkDayRollover();
     }
 
-    /**
-     * Called externally (e.g., from notification action or dashboard) to increment counter.
-     */
     public void increment() {
         if (ctx == null) return;
         int today = Prefs.getInt(ctx, "fap_today", 0);
         today++;
         Prefs.setInt(ctx, "fap_today", today);
 
-        // Update monthly total
         int monthly = Prefs.getInt(ctx, "fap_monthly", 0);
         Prefs.setInt(ctx, "fap_monthly", monthly + 1);
 
-        // Update all-time total
         int allTime = Prefs.getInt(ctx, "fap_all_time", 0);
         Prefs.setInt(ctx, "fap_all_time", allTime + 1);
 
-        // Reset streak (days without)
         Prefs.setInt(ctx, "fap_streak", 0);
         Prefs.setInt(ctx, "fap_last_day", getDayOfYear());
     }
 
-    /**
-     * Check if day changed and update streak/daily counter accordingly.
-     */
     private void checkDayRollover() {
         if (ctx == null) return;
         int currentDay = getDayOfYear();
         int lastDay = Prefs.getInt(ctx, "fap_last_check_day", -1);
 
         if (lastDay == -1) {
-            // First run
+
             Prefs.setInt(ctx, "fap_last_check_day", currentDay);
             return;
         }
 
         if (currentDay != lastDay) {
-            // Day changed
+
             int todayCount = Prefs.getInt(ctx, "fap_today", 0);
 
             if (todayCount == 0) {
-                // No faps yesterday → increase streak
+
                 int streak = Prefs.getInt(ctx, "fap_streak", 0);
                 Prefs.setInt(ctx, "fap_streak", streak + 1);
             }
 
-            // Save yesterday's count
             Prefs.setInt(ctx, "fap_yesterday", todayCount);
 
-            // Reset daily counter
             Prefs.setInt(ctx, "fap_today", 0);
 
-            // Check month rollover
             int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
             int lastMonth = Prefs.getInt(ctx, "fap_last_month", -1);
             if (lastMonth != -1 && currentMonth != lastMonth) {
@@ -176,7 +164,6 @@ public class FapCounterModule implements Module {
             Prefs.setBool(ctx, "fap_limit_fired", true);
         }
 
-        // Reset alert flag at day change
         if (today == 0 && alertFired) {
             Prefs.setBool(ctx, "fap_limit_fired", false);
         }

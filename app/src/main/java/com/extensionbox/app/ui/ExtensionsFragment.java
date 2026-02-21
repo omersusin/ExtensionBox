@@ -1,6 +1,5 @@
 package com.extensionbox.app.ui;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -12,106 +11,146 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.AdapterView;
 import android.widget.TextView;
+import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.extensionbox.app.Prefs;
 import com.extensionbox.app.R;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class ExtensionsFragment extends Fragment {
 
-    private LinearLayout container;
+    private RecyclerView recyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inf, ViewGroup parent, Bundle saved) {
         View v = inf.inflate(R.layout.fragment_extensions, parent, false);
-        container = v.findViewById(R.id.extContainer);
-        buildList();
+        recyclerView = v.findViewById(R.id.extRecycler);
+
+        setupRecyclerView();
         return v;
     }
 
-    private void buildList() {
-        container.removeAllViews();
-        for (int i = 0; i < ModuleRegistry.count(); i++) {
-            container.addView(buildModuleCard(i));
+    private void setupRecyclerView() {
+        recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
+        recyclerView.setPadding(dp(16), dp(16), dp(16), dp(16));
+        recyclerView.setClipToPadding(false);
+        recyclerView.setAdapter(new ExtensionAdapter());
+    }
+
+    private class ExtensionAdapter extends RecyclerView.Adapter<ExtensionAdapter.VH> {
+
+        @NonNull
+        @Override
+        public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_extension_card, parent, false);
+            return new VH(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull VH holder, int position) {
+            String key = ModuleRegistry.keyAt(position);
+            String name = ModuleRegistry.nameAt(position);
+            String desc = ModuleRegistry.descAt(position);
+            int iconRes = ModuleRegistry.iconResFor(key);
+            boolean def = ModuleRegistry.defAt(position);
+            boolean enabled = Prefs.isModuleEnabled(requireContext(), key, def);
+
+            TextView tvTitle = holder.itemView.findViewById(R.id.tvTitle);
+            TextView tvDesc = holder.itemView.findViewById(R.id.tvDesc);
+            ImageView imgIcon = holder.itemView.findViewById(R.id.imgIcon);
+            MaterialSwitch sw = holder.itemView.findViewById(R.id.switchEnable);
+            MaterialButton btnSettings = holder.itemView.findViewById(R.id.btnSettings);
+            MaterialCardView card = (MaterialCardView) holder.itemView;
+
+            tvTitle.setText(name);
+            tvDesc.setText(desc);
+            imgIcon.setImageResource(iconRes);
+
+            sw.setOnCheckedChangeListener(null);
+            sw.setChecked(enabled);
+
+            card.setAlpha(enabled ? 1.0f : 0.6f);
+            btnSettings.setVisibility(enabled ? View.VISIBLE : View.GONE);
+
+            sw.setOnCheckedChangeListener((b, checked) -> {
+
+                if (checked && "app_usage".equals(key) && !hasUsageAccess()) {
+                    sw.setChecked(false);
+
+                    try {
+                        startActivity(new android.content.Intent(
+                            android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS));
+                        android.widget.Toast.makeText(requireContext(),
+                            "Please enable Usage Access for Extension Box", android.widget.Toast.LENGTH_LONG).show();
+                    } catch (Exception ignored) {}
+                    return;
+                }
+                Prefs.setModuleEnabled(requireContext(), key, checked);
+                card.setAlpha(checked ? 1.0f : 0.6f);
+                btnSettings.setVisibility(checked ? View.VISIBLE : View.GONE);
+            });
+
+            btnSettings.setOnClickListener(v -> showSettingsSheet(key, name));
+        }
+
+        @Override
+        public int getItemCount() {
+            return ModuleRegistry.count();
+        }
+
+        class VH extends RecyclerView.ViewHolder {
+            VH(@NonNull View v) { super(v); }
         }
     }
 
-    private View buildModuleCard(int idx) {
-        String key = ModuleRegistry.keyAt(idx);
+    private boolean hasUsageAccess() {
+        try {
+            android.app.AppOpsManager aom = (android.app.AppOpsManager)
+                    requireContext().getSystemService(android.content.Context.APP_OPS_SERVICE);
+            int mode = aom.checkOpNoThrow(
+                    android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(),
+                    requireContext().getPackageName());
+            return mode == android.app.AppOpsManager.MODE_ALLOWED;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-        MaterialCardView card = new MaterialCardView(requireContext());
-        LinearLayout.LayoutParams clp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        clp.bottomMargin = dp(6);
-        card.setLayoutParams(clp);
-        card.setContentPadding(dp(16), dp(12), dp(16), dp(12));
-        card.setCardElevation(0);
-        card.setStrokeWidth(0);
-
-        LinearLayout outer = new LinearLayout(requireContext());
-        outer.setOrientation(LinearLayout.VERTICAL);
-
-        // Row 1: Title + Switch
-        LinearLayout row1 = new LinearLayout(requireContext());
-        row1.setOrientation(LinearLayout.HORIZONTAL);
-        row1.setGravity(android.view.Gravity.CENTER_VERTICAL);
-
-        LinearLayout titleCol = new LinearLayout(requireContext());
-        titleCol.setOrientation(LinearLayout.VERTICAL);
-        titleCol.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+    private void showSettingsSheet(String key, String name) {
+        BottomSheetDialog sheet = new BottomSheetDialog(requireContext());
+        LinearLayout layout = new LinearLayout(requireContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(dp(24), dp(16), dp(24), dp(24));
 
         TextView title = new TextView(requireContext());
-        title.setText(ModuleRegistry.emojiAt(idx) + "  " + ModuleRegistry.nameAt(idx));
-        title.setTextSize(16);
-        titleCol.addView(title);
+        title.setText(name + " Settings");
+        title.setTextSize(20);
+        title.setTypeface(null, android.graphics.Typeface.BOLD);
+        title.setPadding(0, 0, 0, dp(16));
+        layout.addView(title);
 
-        TextView desc = new TextView(requireContext());
-        desc.setText(ModuleRegistry.descAt(idx));
-        desc.setTextSize(12);
-        desc.setAlpha(0.6f);
-        titleCol.addView(desc);
+        buildSettingsPanel(layout, key);
 
-        row1.addView(titleCol);
+        if (layout.getChildCount() == 1) {
+            TextView empty = new TextView(requireContext());
+            empty.setText("No settings available for this module.");
+            empty.setAlpha(0.6f);
+            layout.addView(empty);
+        }
 
-        MaterialSwitch sw = new MaterialSwitch(requireContext());
-        sw.setChecked(Prefs.isModuleEnabled(requireContext(), key, ModuleRegistry.defAt(idx)));
-        row1.addView(sw);
-        outer.addView(row1);
-
-        // Settings panel (collapsed)
-        LinearLayout panel = new LinearLayout(requireContext());
-        panel.setOrientation(LinearLayout.VERTICAL);
-        panel.setPadding(0, dp(12), 0, 0);
-        panel.setVisibility(View.GONE);
-        buildSettingsPanel(panel, key);
-
-        // Settings toggle button
-        TextView btnSettings = new TextView(requireContext());
-        btnSettings.setText("⚙ Settings");
-        btnSettings.setTextSize(13);
-        btnSettings.setPadding(0, dp(8), 0, 0);
-        btnSettings.setAlpha(0.7f);
-        btnSettings.setOnClickListener(v2 ->
-                panel.setVisibility(panel.getVisibility() == View.GONE ? View.VISIBLE : View.GONE));
-        outer.addView(btnSettings);
-        outer.addView(panel);
-
-        // Switch listener
-        sw.setOnCheckedChangeListener((b, checked) -> {
-            Prefs.setModuleEnabled(requireContext(), key, checked);
-            btnSettings.setVisibility(checked ? View.VISIBLE : View.GONE);
-            if (!checked) panel.setVisibility(View.GONE);
-        });
-
-        boolean enabled = sw.isChecked();
-        btnSettings.setVisibility(enabled ? View.VISIBLE : View.GONE);
-
-        card.addView(outer);
-        return card;
+        sheet.setContentView(layout);
+        sheet.show();
     }
 
     private void buildSettingsPanel(LinearLayout panel, String key) {
@@ -226,7 +265,7 @@ public class ExtensionsFragment extends Fragment {
 
         TextView tv = new TextView(requireContext());
         tv.setText(label);
-        tv.setTextSize(14);
+        tv.setTextSize(16);
         tv.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
 
         MaterialSwitch sw = new MaterialSwitch(requireContext());
@@ -238,35 +277,29 @@ public class ExtensionsFragment extends Fragment {
         parent.addView(row);
     }
 
-    /**
-     * Spinner with a "Custom" option at the end.
-     * Selecting "Custom" shows an EditText dialog for custom numeric input.
-     */
     private void addSpinnerWithCustom(LinearLayout parent, String prefKey, String label,
                                       String[] options, int[] values, int def) {
         LinearLayout row = new LinearLayout(requireContext());
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(android.view.Gravity.CENTER_VERTICAL);
-        row.setPadding(0, dp(4), 0, dp(4));
+        row.setOrientation(LinearLayout.VERTICAL);
+        row.setPadding(0, dp(4), 0, dp(12));
 
         TextView tv = new TextView(requireContext());
         tv.setText(label);
         tv.setTextSize(14);
-        tv.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+        tv.setAlpha(0.8f);
+        row.addView(tv);
 
-        // Add "Custom" option
         String[] extOptions = new String[options.length + 1];
         int[] extValues = new int[values.length + 1];
         System.arraycopy(options, 0, extOptions, 0, options.length);
         System.arraycopy(values, 0, extValues, 0, values.length);
         extOptions[options.length] = "Custom…";
-        extValues[values.length] = -1; // sentinel for custom
+        extValues[values.length] = -1;
 
         Spinner sp = new Spinner(requireContext());
         sp.setAdapter(new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_spinner_dropdown_item, extOptions));
 
-        // Find current selection
         int current = Prefs.getInt(requireContext(), prefKey, def);
         boolean found = false;
         for (int i = 0; i < values.length; i++) {
@@ -276,19 +309,19 @@ public class ExtensionsFragment extends Fragment {
                 break;
             }
         }
-        // If current value is custom (not in options), show it selected on "Custom"
+
         if (!found) {
             sp.setSelection(extOptions.length - 1);
         }
 
-        final boolean[] suppressFirst = {true}; // suppress initial onItemSelected
+        final boolean[] suppressFirst = {true};
         sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
                 if (suppressFirst[0]) { suppressFirst[0] = false; return; }
 
                 if (extValues[pos] == -1) {
-                    // Show custom input dialog
+
                     showCustomInputDialog(prefKey, label, sp, extValues);
                 } else {
                     Prefs.setInt(requireContext(), prefKey, extValues[pos]);
@@ -297,7 +330,6 @@ public class ExtensionsFragment extends Fragment {
             @Override public void onNothingSelected(AdapterView<?> p) {}
         });
 
-        row.addView(tv);
         row.addView(sp);
         parent.addView(row);
     }
@@ -326,7 +358,7 @@ public class ExtensionsFragment extends Fragment {
                     } catch (NumberFormatException ignored) {}
                 })
                 .setNegativeButton("Cancel", (d, w) -> {
-                    // Revert spinner to the current saved value
+
                     int saved = Prefs.getInt(requireContext(), prefKey, values[0]);
                     for (int i = 0; i < values.length; i++) {
                         if (values[i] == saved) { sp.setSelection(i); break; }

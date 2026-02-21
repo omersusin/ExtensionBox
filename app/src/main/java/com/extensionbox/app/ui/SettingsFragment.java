@@ -35,7 +35,7 @@ public class SettingsFragment extends Fragment {
         TextView tvTier = v.findViewById(R.id.tvSettingsTier);
         tvTier.setText("🔑 Permission Tier: " + new SystemAccess(requireContext()).getTierName());
 
-        MaterialButton btnBatOpt = v.findViewById(R.id.btnBatteryOpt);
+        View btnBatOpt = v.findViewById(R.id.btnBatteryOpt);
         btnBatOpt.setOnClickListener(b -> {
             try {
                 PowerManager pm = (PowerManager) requireContext().getSystemService(Context.POWER_SERVICE);
@@ -51,7 +51,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        MaterialButton btnReset = v.findViewById(R.id.btnResetDaily);
+        View btnReset = v.findViewById(R.id.btnResetDaily);
         btnReset.setOnClickListener(b -> {
             Prefs.setInt(requireContext(), "ulk_today", 0);
             Prefs.setLong(requireContext(), "stp_today", 0);
@@ -63,7 +63,7 @@ public class SettingsFragment extends Fragment {
             Toast.makeText(requireContext(), "Daily stats reset ✓", Toast.LENGTH_SHORT).show();
         });
 
-        MaterialButton btnResetAll = v.findViewById(R.id.btnResetAll);
+        View btnResetAll = v.findViewById(R.id.btnResetAll);
         btnResetAll.setOnClickListener(b -> {
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Reset All Data")
@@ -77,7 +77,7 @@ public class SettingsFragment extends Fragment {
                     .show();
         });
 
-        MaterialButton btnExport = v.findViewById(R.id.btnExportStrings);
+        View btnExport = v.findViewById(R.id.btnExportStrings);
         btnExport.setOnClickListener(b -> exportStringsXml());
 
         return v;
@@ -85,12 +85,11 @@ public class SettingsFragment extends Fragment {
 
     private void exportStringsXml() {
         try {
-            // Read current strings.xml from app resources
+
             InputStream is = requireContext().getResources().openRawResource(
                     requireContext().getResources().getIdentifier("strings_export_template",
                             "raw", requireContext().getPackageName()));
 
-            // Fallback: generate strings.xml manually
             StringBuilder sb = new StringBuilder();
             sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
             sb.append("<!-- ═══════════════════════════════════════════════════════════\n");
@@ -153,7 +152,6 @@ public class SettingsFragment extends Fragment {
             sb.append("    <string name=\"streak\">Streak</string>\n");
             sb.append("</resources>\n");
 
-            // Write to Downloads
             File downloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             File output = new File(downloads, "extensionbox_strings.xml");
             FileWriter fw = new FileWriter(output);
@@ -165,11 +163,11 @@ public class SettingsFragment extends Fragment {
                     Toast.LENGTH_LONG).show();
 
         } catch (Exception e) {
-            // Fallback: try app-specific directory
+
             try {
                 File output = new File(requireContext().getExternalFilesDir(null),
                         "extensionbox_strings.xml");
-                // Re-generate content (simplified)
+
                 FileWriter fw = new FileWriter(output);
                 fw.write("<!-- See Downloads folder or check Extension Box Settings -->\n");
                 fw.close();

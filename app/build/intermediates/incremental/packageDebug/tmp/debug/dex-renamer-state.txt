@@ -1,0 +1,16 @@
+#Sat Feb 21 10:04:10 IST 2026
+path.4=9/classes.dex
+path.3=6/classes.dex
+path.2=5/classes.dex
+path.1=0/classes.dex
+path.0=classes.dex
+base.4=/home/bhanu/ExtensionBox/app/build/intermediates/dex/debug/mergeProjectDexDebug/9/classes.dex
+base.3=/home/bhanu/ExtensionBox/app/build/intermediates/dex/debug/mergeProjectDexDebug/6/classes.dex
+base.2=/home/bhanu/ExtensionBox/app/build/intermediates/dex/debug/mergeProjectDexDebug/5/classes.dex
+base.1=/home/bhanu/ExtensionBox/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+base.0=/home/bhanu/ExtensionBox/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
+renamed.3=classes4.dex
+renamed.2=classes3.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+renamed.4=classes5.dex

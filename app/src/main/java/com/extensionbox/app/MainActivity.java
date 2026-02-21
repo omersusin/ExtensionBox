@@ -77,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
                     != PackageManager.PERMISSION_GRANTED)
                 perms.add(Manifest.permission.ACTIVITY_RECOGNITION);
         }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            perms.add(Manifest.permission.READ_PHONE_STATE);
+        }
+
         if (!perms.isEmpty())
             ActivityCompat.requestPermissions(this, perms.toArray(new String[0]), 100);
     }

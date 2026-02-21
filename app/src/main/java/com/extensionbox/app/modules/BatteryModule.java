@@ -169,8 +169,6 @@ public class BatteryModule implements Module {
         }
     }
 
-    // ── Helpers ──
-
     public int getLevel() { return level; }
 
     private boolean isCharging() {

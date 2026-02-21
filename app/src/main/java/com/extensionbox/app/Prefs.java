@@ -11,7 +11,6 @@ public final class Prefs {
         return c.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
 
-    // ── Module enabled ──
     public static boolean isModuleEnabled(Context c, String key, boolean def) {
         return p(c).getBoolean("m_" + key + "_enabled", def);
     }
@@ -20,7 +19,6 @@ public final class Prefs {
         p(c).edit().putBoolean("m_" + key + "_enabled", val).apply();
     }
 
-    // ── Service state ──
     public static boolean isRunning(Context c) {
         return p(c).getBoolean("running", false);
     }
@@ -29,7 +27,6 @@ public final class Prefs {
         p(c).edit().putBoolean("running", val).apply();
     }
 
-    // ── Generic getters/setters for module-specific data ──
     public static int getInt(Context c, String key, int def) {
         return p(c).getInt(key, def);
     }

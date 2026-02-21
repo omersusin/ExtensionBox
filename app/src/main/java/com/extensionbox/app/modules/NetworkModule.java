@@ -16,12 +16,10 @@ public class NetworkModule implements Module {
     private Context ctx;
     private boolean running = false;
 
-    // Separate tracking for Rx and Tx
     private long prevRx, prevTx;
     private long prevTime;
-    private long dlSpeed, ulSpeed; // bytes/sec
+    private long dlSpeed, ulSpeed;
 
-    // Smoothing: keep previous values to average
     private long prevDlSpeed, prevUlSpeed;
 
     @Override public String key() { return "network"; }
@@ -39,22 +37,47 @@ public class NetworkModule implements Module {
     @Override
     public void start(Context c, SystemAccess sys) {
         ctx = c;
-        // Use elapsedRealtime for more accurate timing (not affected by wall clock changes)
         prevTime = SystemClock.elapsedRealtime();
 
-        // Read initial values
-        long rx = TrafficStats.getTotalRxBytes();
-        long tx = TrafficStats.getTotalTxBytes();
-
-        // TrafficStats returns UNSUPPORTED (-1) on some devices
-        prevRx = (rx != TrafficStats.UNSUPPORTED) ? rx : 0;
-        prevTx = (tx != TrafficStats.UNSUPPORTED) ? tx : 0;
+        long[] stats = readNetworkStats();
+        prevRx = stats[0];
+        prevTx = stats[1];
 
         dlSpeed = 0;
         ulSpeed = 0;
         prevDlSpeed = 0;
         prevUlSpeed = 0;
         running = true;
+    }
+
+    private long[] readNetworkStats() {
+        long rx = TrafficStats.getTotalRxBytes();
+        long tx = TrafficStats.getTotalTxBytes();
+
+        if (rx == TrafficStats.UNSUPPORTED || tx == TrafficStats.UNSUPPORTED) {
+
+            long procRx = 0, procTx = 0;
+            try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader("/proc/net/dev"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.contains("lo:")) continue;
+                    String[] tokens = line.trim().split("\\s+");
+                    if (tokens.length >= 10) {
+                        try {
+                            String rxStr = tokens[1];
+                            String txStr = tokens[tokens.length > 16 ? 9 : 9];
+
+                            procRx += Long.parseLong(rxStr);
+                            procTx += Long.parseLong(txStr);
+                        } catch (NumberFormatException ignored) {}
+                    }
+                }
+                return new long[]{procRx, procTx};
+            } catch (Exception e) {
+                return new long[]{0, 0};
+            }
+        }
+        return new long[]{rx, tx};
     }
 
     @Override
@@ -66,10 +89,12 @@ public class NetworkModule implements Module {
 
     @Override
     public void tick() {
-        long rx = TrafficStats.getTotalRxBytes();
-        long tx = TrafficStats.getTotalTxBytes();
+        long[] stats = readNetworkStats();
+        long rx = stats[0];
+        long tx = stats[1];
 
-        if (rx == TrafficStats.UNSUPPORTED || tx == TrafficStats.UNSUPPORTED) {
+        if (rx == 0 && tx == 0 && prevRx == 0 && prevTx == 0) {
+
             dlSpeed = 0;
             ulSpeed = 0;
             return;
@@ -82,16 +107,12 @@ public class NetworkModule implements Module {
             long rxDelta = rx - prevRx;
             long txDelta = tx - prevTx;
 
-            // Guard against counter reset or negative values
             if (rxDelta < 0) rxDelta = 0;
             if (txDelta < 0) txDelta = 0;
 
-            // Calculate bytes per second
             long rawDl = rxDelta * 1000 / dtMs;
             long rawUl = txDelta * 1000 / dtMs;
 
-            // Exponential moving average for smoother display
-            // weight: 60% new, 40% old
             dlSpeed = (rawDl * 6 + prevDlSpeed * 4) / 10;
             ulSpeed = (rawUl * 6 + prevUlSpeed * 4) / 10;
 
@@ -126,6 +147,6 @@ public class NetworkModule implements Module {
 
     @Override
     public void checkAlerts(Context ctx) {
-        // No alerts for network speed
+
     }
 }

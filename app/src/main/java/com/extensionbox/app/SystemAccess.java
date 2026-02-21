@@ -8,8 +8,7 @@ public class SystemAccess {
     private final String tier;
 
     public SystemAccess(Context ctx) {
-        // Sprint 1: Normal tier only
-        // Sprint 2 adds Shizuku/Root detection
+
         tier = "Normal";
     }
 

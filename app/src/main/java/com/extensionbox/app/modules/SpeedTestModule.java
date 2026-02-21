@@ -33,14 +33,12 @@ public class SpeedTestModule implements Module {
     private int testsToday = 0;
     private boolean testing = false;
 
-    // Multiple test URLs for fallback
     private static final String[] TEST_URLS = {
             "https://speed.cloudflare.com/__down?bytes=5000000",
             "https://proof.ovh.net/files/1Mb.dat",
             "https://ash-speed.hetzner.com/1MB.bin"
     };
 
-    // Upload test URL
     private static final String UPLOAD_TEST_URL = "https://speed.cloudflare.com/__up";
 
     @Override public String key() { return "speedtest"; }
@@ -72,7 +70,7 @@ public class SpeedTestModule implements Module {
                     handler.postDelayed(this, freqMin * 60000L);
                 }
             };
-            // First test after 10s
+
             handler.postDelayed(testRunnable, 10000);
         }
     }
@@ -109,15 +107,13 @@ public class SpeedTestModule implements Module {
         ulResult = "...";
 
         new Thread(() -> {
-            // --- Ping Test ---
+
             if (Prefs.getBool(ctx, "spd_show_ping", true)) {
                 pingResult = doPing();
             }
 
-            // --- Download Test (try multiple URLs) ---
             dlResult = doDownloadTest();
 
-            // --- Upload Test ---
             ulResult = doUploadTest();
 
             testsToday++;
@@ -128,7 +124,7 @@ public class SpeedTestModule implements Module {
 
     private String doPing() {
         try {
-            // TCP connect-based ping to Cloudflare
+
             long start = System.currentTimeMillis();
             Socket sock = new Socket();
             sock.connect(new java.net.InetSocketAddress("1.1.1.1", 443), 5000);
@@ -136,7 +132,7 @@ public class SpeedTestModule implements Module {
             sock.close();
             return elapsed + "ms";
         } catch (Exception e) {
-            // Fallback: try InetAddress reachability
+
             try {
                 long start = System.currentTimeMillis();
                 InetAddress addr = InetAddress.getByName("1.1.1.1");
@@ -160,13 +156,13 @@ public class SpeedTestModule implements Module {
 
                 long start = System.currentTimeMillis();
                 InputStream is = c.getInputStream();
-                byte[] buf = new byte[32768]; // Larger buffer for better throughput
+                byte[] buf = new byte[32768];
                 long total = 0;
                 int r;
 
                 while ((r = is.read(buf)) != -1) {
                     total += r;
-                    // Timeout after 15 seconds max
+
                     if (System.currentTimeMillis() - start > 15000) break;
                 }
 
@@ -179,7 +175,7 @@ public class SpeedTestModule implements Module {
                     return String.format(Locale.US, "%.1f Mbps", mbps);
                 }
             } catch (Exception e) {
-                // Try next URL
+
                 continue;
             }
         }
@@ -188,7 +184,7 @@ public class SpeedTestModule implements Module {
 
     private String doUploadTest() {
         try {
-            // Generate 1MB of random data to upload
+
             byte[] uploadData = new byte[1024 * 1024];
             for (int i = 0; i < uploadData.length; i++) {
                 uploadData[i] = (byte) (i & 0xFF);
@@ -205,20 +201,19 @@ public class SpeedTestModule implements Module {
 
             long start = System.currentTimeMillis();
             OutputStream os = c.getOutputStream();
-            // Write in chunks
+
             int offset = 0;
             int chunkSize = 32768;
             while (offset < uploadData.length) {
                 int len = Math.min(chunkSize, uploadData.length - offset);
                 os.write(uploadData, offset, len);
                 offset += len;
-                // Timeout after 15 seconds
+
                 if (System.currentTimeMillis() - start > 15000) break;
             }
             os.flush();
             os.close();
 
-            // Read response to complete the request
             int code = c.getResponseCode();
             long ms = System.currentTimeMillis() - start;
             c.disconnect();
@@ -228,7 +223,7 @@ public class SpeedTestModule implements Module {
                 return String.format(Locale.US, "%.1f Mbps", mbps);
             }
         } catch (Exception e) {
-            // Upload test is optional, don't fail hard
+
         }
         return "—";
     }

@@ -1,0 +1,220 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="extension.box"
+4    android:versionCode="4"
+5    android:versionName="1.0-sprint4" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+11-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:5:5-77
+11-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:5:22-74
+12    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+12-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:6:5-89
+12-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:6:22-86
+13    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+13-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:7:5-77
+13-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:7:22-74
+14    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+14-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:8:5-81
+14-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:8:22-78
+15    <uses-permission android:name="android.permission.INTERNET" />
+15-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:9:5-67
+15-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:9:22-64
+16    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+16-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:10:5-79
+16-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:10:22-76
+17    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+17-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:11:5-76
+17-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:11:22-73
+18    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+18-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:12:5-75
+18-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:12:22-72
+19    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+19-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:13:5-79
+19-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:13:22-76
+20    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+20-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:14:5-113
+20-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:14:22-75
+21
+22    <permission
+22-->[androidx.core:core:1.13.0] /home/bhanu/.gradle/caches/transforms-4/70d87d60132c4cef9275a4da30cebe46/transformed/core-1.13.0/AndroidManifest.xml:22:5-24:47
+23        android:name="extension.box.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+23-->[androidx.core:core:1.13.0] /home/bhanu/.gradle/caches/transforms-4/70d87d60132c4cef9275a4da30cebe46/transformed/core-1.13.0/AndroidManifest.xml:23:9-81
+24        android:protectionLevel="signature" />
+24-->[androidx.core:core:1.13.0] /home/bhanu/.gradle/caches/transforms-4/70d87d60132c4cef9275a4da30cebe46/transformed/core-1.13.0/AndroidManifest.xml:24:9-44
+25
+26    <uses-permission android:name="extension.box.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+26-->[androidx.core:core:1.13.0] /home/bhanu/.gradle/caches/transforms-4/70d87d60132c4cef9275a4da30cebe46/transformed/core-1.13.0/AndroidManifest.xml:26:5-97
+26-->[androidx.core:core:1.13.0] /home/bhanu/.gradle/caches/transforms-4/70d87d60132c4cef9275a4da30cebe46/transformed/core-1.13.0/AndroidManifest.xml:26:22-94
+27
+28    <application
+28-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:16:5-70:19
+29        android:name="com.extensionbox.app.ExtensionBoxApp"
+29-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:17:9-40
+30        android:allowBackup="true"
+30-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:18:9-35
+31        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+31-->[androidx.core:core:1.13.0] /home/bhanu/.gradle/caches/transforms-4/70d87d60132c4cef9275a4da30cebe46/transformed/core-1.13.0/AndroidManifest.xml:28:18-86
+32        android:debuggable="true"
+33        android:extractNativeLibs="false"
+34        android:label="@string/app_name"
+34-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:19:9-41
+35        android:supportsRtl="true"
+35-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:21:9-35
+36        android:theme="@style/AppTheme" >
+36-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:20:9-40
+37        <activity
+37-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:23:9-31:20
+38            android:name="com.extensionbox.app.MainActivity"
+38-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:24:13-41
+39            android:exported="true"
+39-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:25:13-36
+40            android:launchMode="singleTop" >
+40-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:26:13-43
+41            <intent-filter>
+41-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:27:13-30:29
+42                <action android:name="android.intent.action.MAIN" />
+42-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:28:17-69
+42-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:28:25-66
+43
+44                <category android:name="android.intent.category.LAUNCHER" />
+44-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:29:17-77
+44-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:29:27-74
+45            </intent-filter>
+46        </activity>
+47
+48        <provider
+49            android:name="androidx.core.content.FileProvider"
+49-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:34:13-62
+50            android:authorities="extension.box.fileprovider"
+50-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:35:13-64
+51            android:exported="false"
+51-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:36:13-37
+52            android:grantUriPermissions="true" >
+52-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:37:13-47
+53            <meta-data
+53-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:38:13-40:62
+54                android:name="android.support.FILE_PROVIDER_PATHS"
+54-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:39:17-67
+55                android:resource="@xml/fileprovider_paths" />
+55-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:40:17-59
+56        </provider>
+57
+58        <service
+58-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:43:9-50:19
+59            android:name="com.extensionbox.app.MonitorService"
+59-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:44:13-43
+60            android:exported="false"
+60-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:46:13-37
+61            android:foregroundServiceType="specialUse" >
+61-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:45:13-55
+62            <property
+62-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:47:13-49:89
+63                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+63-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:48:17-76
+64                android:value="System monitoring: battery, network, usage statistics" />
+64-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:49:17-86
+65        </service>
+66        <service
+66-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:52:9-60:19
+67            android:name="com.extensionbox.app.MonitorTileService"
+67-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:53:13-47
+68            android:exported="true"
+68-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:54:13-36
+69            android:label="Extension Box"
+69-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:55:13-42
+70            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" >
+70-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:56:13-77
+71            <intent-filter>
+71-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:57:13-59:29
+72                <action android:name="android.service.quicksettings.action.QS_TILE" />
+72-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:58:17-87
+72-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:58:25-84
+73            </intent-filter>
+74        </service>
+75
+76        <receiver
+76-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:62:9-68:20
+77            android:name="com.extensionbox.app.BootReceiver"
+77-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:63:13-41
+78            android:exported="true" >
+78-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:64:13-36
+79            <intent-filter>
+79-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:65:13-67:29
+80                <action android:name="android.intent.action.BOOT_COMPLETED" />
+80-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:66:17-79
+80-->/home/bhanu/ExtensionBox/app/src/main/AndroidManifest.xml:66:25-76
+81            </intent-filter>
+82        </receiver>
+83
+84        <provider
+84-->[androidx.emoji2:emoji2:1.2.0] /home/bhanu/.gradle/caches/transforms-4/3096be1dbc00866d160560a9e46569ee/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+85            android:name="androidx.startup.InitializationProvider"
+85-->[androidx.emoji2:emoji2:1.2.0] /home/bhanu/.gradle/caches/transforms-4/3096be1dbc00866d160560a9e46569ee/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+86            android:authorities="extension.box.androidx-startup"
+86-->[androidx.emoji2:emoji2:1.2.0] /home/bhanu/.gradle/caches/transforms-4/3096be1dbc00866d160560a9e46569ee/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+87            android:exported="false" >
+87-->[androidx.emoji2:emoji2:1.2.0] /home/bhanu/.gradle/caches/transforms-4/3096be1dbc00866d160560a9e46569ee/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+88            <meta-data
+88-->[androidx.emoji2:emoji2:1.2.0] /home/bhanu/.gradle/caches/transforms-4/3096be1dbc00866d160560a9e46569ee/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+89                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+89-->[androidx.emoji2:emoji2:1.2.0] /home/bhanu/.gradle/caches/transforms-4/3096be1dbc00866d160560a9e46569ee/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+90                android:value="androidx.startup" />
+90-->[androidx.emoji2:emoji2:1.2.0] /home/bhanu/.gradle/caches/transforms-4/3096be1dbc00866d160560a9e46569ee/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+91            <meta-data
+91-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/bhanu/.gradle/caches/transforms-4/4758362f20bddfa8a605fd1111cb2238/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+92                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+92-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/bhanu/.gradle/caches/transforms-4/4758362f20bddfa8a605fd1111cb2238/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+93                android:value="androidx.startup" />
+93-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/bhanu/.gradle/caches/transforms-4/4758362f20bddfa8a605fd1111cb2238/transformed/lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+94            <meta-data
+94-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+95                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+95-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+96                android:value="androidx.startup" />
+96-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+97        </provider>
+98
+99        <receiver
+99-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+100            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+100-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+101            android:directBootAware="false"
+101-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+102            android:enabled="true"
+102-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+103            android:exported="true"
+103-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+104            android:permission="android.permission.DUMP" >
+104-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+105            <intent-filter>
+105-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+106                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+106-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+107            </intent-filter>
+108            <intent-filter>
+108-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+109                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+109-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+109-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+110            </intent-filter>
+111            <intent-filter>
+111-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+112                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+112-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+112-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+113            </intent-filter>
+114            <intent-filter>
+114-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+115                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+115-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+115-->[androidx.profileinstaller:profileinstaller:1.3.0] /home/bhanu/.gradle/caches/transforms-4/ee500109eea714ca2ca5e57357691176/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
+116            </intent-filter>
+117        </receiver>
+118    </application>
+119
+120</manifest>

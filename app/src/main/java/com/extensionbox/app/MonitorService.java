@@ -17,10 +17,13 @@ import androidx.core.app.NotificationCompat;
 import com.extensionbox.app.modules.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MonitorService extends Service {
 
@@ -61,6 +64,7 @@ public class MonitorService extends Service {
         modules.add(new StepModule());
         modules.add(new SpeedTestModule());
         modules.add(new FapCounterModule());
+        modules.add(new AppUsageModule());
         lastTickTime = new HashMap<>();
 
         startForeground(NOTIF_ID, buildNotification());
@@ -127,6 +131,8 @@ public class MonitorService extends Service {
                 m.checkAlerts(this);
                 lastTickTime.put(m.key(), now);
                 moduleData.put(m.key(), m.dataPoints());
+
+                logToHistory(m.key(), m.dataPoints());
                 changed = true;
             }
         }
@@ -223,5 +229,19 @@ public class MonitorService extends Service {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             nm.notify(NOTIF_ID, buildNotification());
         } catch (Exception ignored) {}
+    }
+
+    private void logToHistory(String moduleKey, LinkedHashMap<String, String> data) {
+        if (data == null) return;
+        Set<String> interestingKeys = new HashSet<>(Arrays.asList(
+                "bat.level", "bat.temp", "cpu.usage", "ram.used_pct",
+                "net.download", "net.upload", "data.daily_mb", "scr.on_min"));
+        for (Map.Entry<String, String> e : data.entrySet()) {
+            if (interestingKeys.contains(e.getKey())) {
+                try {
+                    HistoryHelper.get(this).insert(moduleKey, e.getKey(), e.getValue());
+                } catch (Exception ignored) {}
+            }
+        }
     }
 }

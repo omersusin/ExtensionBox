@@ -21,11 +21,10 @@ public class AboutFragment extends Fragment {
     public View onCreateView(LayoutInflater inf, ViewGroup parent, Bundle saved) {
         View v = inf.inflate(R.layout.fragment_about, parent, false);
 
-        // Dev card click listeners
         View devCard1 = v.findViewById(R.id.devCard1);
         if (devCard1 != null) {
             devCard1.setOnClickListener(view -> {
-                // AI doesn't have a profile link, do nothing
+
             });
         }
 
@@ -40,7 +39,6 @@ public class AboutFragment extends Fragment {
             });
         }
 
-        // Source code link
         View btnSource = v.findViewById(R.id.btnSourceCode);
         if (btnSource != null) {
             btnSource.setOnClickListener(view -> {

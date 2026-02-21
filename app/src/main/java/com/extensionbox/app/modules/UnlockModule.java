@@ -101,7 +101,6 @@ public class UnlockModule implements Module {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format(Locale.US, "🔓 Unlocked: %d times today", count));
 
-        // Hourly rate
         Calendar cal = Calendar.getInstance();
         float hoursSinceMidnight = cal.get(Calendar.HOUR_OF_DAY)
                 + cal.get(Calendar.MINUTE) / 60f;

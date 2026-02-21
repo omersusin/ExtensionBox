@@ -90,16 +90,21 @@ public class ConnectionModule implements Module {
         try {
             TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
             carrier = tm.getNetworkOperatorName();
-            if (carrier == null || carrier.isEmpty()) carrier = "Unknown";
-            int type = tm.getDataNetworkType();
-            switch (type) {
-                case TelephonyManager.NETWORK_TYPE_LTE: netType = "LTE"; break;
-                case TelephonyManager.NETWORK_TYPE_NR: netType = "5G"; break;
-                case TelephonyManager.NETWORK_TYPE_HSDPA:
-                case TelephonyManager.NETWORK_TYPE_HSUPA:
-                case TelephonyManager.NETWORK_TYPE_HSPA: netType = "3G"; break;
-                case TelephonyManager.NETWORK_TYPE_EDGE: netType = "2G"; break;
-                default: netType = "Unknown"; break;
+            if (carrier == null || carrier.trim().isEmpty()) carrier = "Unknown Carrier";
+
+            if (androidx.core.content.ContextCompat.checkSelfPermission(ctx, android.Manifest.permission.READ_PHONE_STATE) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                int type = tm.getDataNetworkType();
+                switch (type) {
+                    case TelephonyManager.NETWORK_TYPE_LTE: netType = "LTE"; break;
+                    case TelephonyManager.NETWORK_TYPE_NR: netType = "5G"; break;
+                    case TelephonyManager.NETWORK_TYPE_HSDPA:
+                    case TelephonyManager.NETWORK_TYPE_HSUPA:
+                    case TelephonyManager.NETWORK_TYPE_HSPA: netType = "3G"; break;
+                    case TelephonyManager.NETWORK_TYPE_EDGE: netType = "2G"; break;
+                    default: netType = "Unknown Type"; break;
+                }
+            } else {
+                netType = "No Perm";
             }
         } catch (Exception e) {
             carrier = "—"; netType = "—";

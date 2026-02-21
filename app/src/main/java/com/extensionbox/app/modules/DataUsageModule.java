@@ -88,7 +88,7 @@ public class DataUsageModule implements Module {
             Prefs.setLong(ctx, "dat_month_wifi", monthWifi);
             Prefs.setLong(ctx, "dat_month_mobile", monthMobile);
         } else if (total < prevTotal) {
-            // reboot detected
+
         }
         prevTotal = total;
         prevMobile = mobile;

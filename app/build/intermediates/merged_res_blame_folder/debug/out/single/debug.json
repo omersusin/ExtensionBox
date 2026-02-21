@@ -1,0 +1,266 @@
+[
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_storage.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_storage.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_fap.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_fap.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_storage.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_storage.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_info.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_info.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_timer_uptime.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_timer_uptime.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_dashboard.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_dashboard.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_uptime.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_uptime.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_network.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_network.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_wifi_tethering.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_wifi_tethering.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_network.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_network.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_cpu_ram.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_cpu_ram.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_data.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_data.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_screen.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_screen.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_item_dash_card.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/item_dash_card.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_connection.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_connection.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_notif.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_notif.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_battery_full.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_battery_full.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/xml_fileprovider_paths.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/xml/fileprovider_paths.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_battery.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_battery.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_delete_forever.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_delete_forever.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_directions_walk.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_directions_walk.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_item_extension_card.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/item_extension_card.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_unlock.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_unlock.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_extensions.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_extensions.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_uptime.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_uptime.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_sleep.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_sleep.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_data_usage.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_data_usage.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_activity_main.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_network_signal.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_network_signal.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_battery.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_battery.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_fragment_about.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/fragment_about.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_layout_notification.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/layout_notification.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_notif.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_notif.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_cpu_ram.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_cpu_ram.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_translate.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_translate.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/menu_bottom_nav.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/menu/bottom_nav.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_data.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_data.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/layout_layout_notification.xml.flat",
+        "source": "com.extensionbox.app-main-34:/layout/layout_notification.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_speed_test.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_speed_test.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_settings.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_settings.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_sd_storage.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_sd_storage.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_screen.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_screen.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_steps.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_steps.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_info.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_info.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_smartphone_screen.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_smartphone_screen.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_lock_open.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_lock_open.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_fragment_settings.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/fragment_settings.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_connection.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_connection.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_about.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_about.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_sheet_history_chart.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/sheet_history_chart.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_dashboard.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_dashboard.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_fragment_dashboard.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/fragment_dashboard.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/layout_fragment_extensions.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/layout/fragment_extensions.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_speedtest.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_speedtest.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/layout_fragment_settings.xml.flat",
+        "source": "com.extensionbox.app-main-34:/layout/fragment_settings.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_unlock.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_unlock.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_bedtime_sleep.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_bedtime_sleep.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_sleep.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_sleep.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_outline_fap.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_outline_fap.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_memory_cpu.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_memory_cpu.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_dashboard.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_dashboard.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_spa_flower.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_spa_flower.xml"
+    },
+    {
+        "merged": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-merged_res-32:/drawable_ic_code.xml.flat",
+        "source": "/home/bhanu/.gradle/daemon/8.7/com.extensionbox.app-main-34:/drawable/ic_code.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/layout_item_dash_card.xml.flat",
+        "source": "com.extensionbox.app-main-34:/layout/item_dash_card.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_steps.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_steps.xml"
+    },
+    {
+        "merged": "com.extensionbox.app-merged_res-32:/drawable_ic_outline_speedtest.xml.flat",
+        "source": "com.extensionbox.app-main-34:/drawable/ic_outline_speedtest.xml"
+    }
+]

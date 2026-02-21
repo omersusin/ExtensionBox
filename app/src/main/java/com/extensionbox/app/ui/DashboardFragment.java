@@ -18,6 +18,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.widget.ImageView;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import com.extensionbox.app.MonitorService;
 import com.extensionbox.app.Prefs;
@@ -42,6 +45,7 @@ public class DashboardFragment extends Fragment {
     private DashCardAdapter adapter;
     private ItemTouchHelper touchHelper;
     private final List<DashCard> cards = new ArrayList<>();
+    private int lastPosition = -1;
 
     @Override
     public View onCreateView(LayoutInflater inf, ViewGroup parent, Bundle saved) {
@@ -64,10 +68,11 @@ public class DashboardFragment extends Fragment {
 
         adapter = new DashCardAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerView.setPadding(dp(16), dp(16), dp(16), dp(16));
+        recyclerView.setClipToPadding(false);
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(null);
 
-        // Drag-to-reorder
         ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
             @Override
@@ -134,7 +139,7 @@ public class DashboardFragment extends Fragment {
         cards.clear();
 
         if (!running) {
-            cards.add(new DashCard("info", "Welcome", "Start monitoring to see live data.", null));
+            cards.add(new DashCard("info", "Welcome", "Start monitoring to see live data.", null, R.drawable.ic_outline_info));
             adapter.notifyDataSetChanged();
             return;
         }
@@ -145,13 +150,13 @@ public class DashboardFragment extends Fragment {
             LinkedHashMap<String, String> data = MonitorService.getModuleData(key);
             if (data == null || data.isEmpty()) continue;
 
-            String emoji = ModuleRegistry.emojiFor(key);
             String name = ModuleRegistry.nameFor(key);
-            cards.add(new DashCard(key, emoji + "  " + name, null, data));
+            int icon = ModuleRegistry.iconResFor(key);
+            cards.add(new DashCard(key, name, null, data, icon));
         }
 
         if (cards.isEmpty()) {
-            cards.add(new DashCard("info", "No data", "No active extensions.", null));
+            cards.add(new DashCard("info", "No data", "No active extensions.", null, R.drawable.ic_outline_info));
         }
 
         adapter.notifyDataSetChanged();
@@ -192,12 +197,14 @@ public class DashboardFragment extends Fragment {
         String title;
         String message;
         LinkedHashMap<String, String> data;
+        int iconRes;
 
-        DashCard(String key, String title, String message, LinkedHashMap<String, String> data) {
+        DashCard(String key, String title, String message, LinkedHashMap<String, String> data, int iconRes) {
             this.key = key;
             this.title = title;
             this.message = message;
             this.data = data;
+            this.iconRes = iconRes;
         }
     }
 
@@ -206,112 +213,88 @@ public class DashboardFragment extends Fragment {
         @NonNull
         @Override
         public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            MaterialCardView card = new MaterialCardView(parent.getContext());
-
-            RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(
-                    RecyclerView.LayoutParams.MATCH_PARENT,
-                    RecyclerView.LayoutParams.WRAP_CONTENT);
-            lp.bottomMargin = dp(10);
-            card.setLayoutParams(lp);
-
-            // Visual polish
-            card.setCardElevation(dp(1));
-            card.setRadius(dp(18));
-            card.setStrokeWidth(dp(1));
-            int outline = MaterialColors.getColor(card, com.google.android.material.R.attr.colorOutline);
-            int surface = MaterialColors.getColor(card, com.google.android.material.R.attr.colorSurface);
-            card.setStrokeColor(outline);
-            card.setCardBackgroundColor(surface);
-
-            card.setContentPadding(dp(16), dp(14), dp(16), dp(14));
-            return new VH(card);
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_dash_card, parent, false);
+            return new VH(v);
         }
 
         @Override
         public void onBindViewHolder(@NonNull VH holder, int position) {
             DashCard item = cards.get(position);
-            MaterialCardView card = (MaterialCardView) holder.itemView;
-            card.removeAllViews();
 
-            LinearLayout inner = new LinearLayout(requireContext());
-            inner.setOrientation(LinearLayout.VERTICAL);
+            TextView title = holder.itemView.findViewById(R.id.tvTitle);
+            TextView message = holder.itemView.findViewById(R.id.tvMessage);
+            ImageView icon = holder.itemView.findViewById(R.id.imgIcon);
+            LinearLayout dataLayout = holder.itemView.findViewById(R.id.layoutData);
 
-            // Header
-            LinearLayout header = new LinearLayout(requireContext());
-            header.setOrientation(LinearLayout.HORIZONTAL);
-            header.setGravity(android.view.Gravity.CENTER_VERTICAL);
-
-            TextView handle = new TextView(requireContext());
-            handle.setText("⋮⋮");
-            handle.setTextSize(16);
-            handle.setAlpha(0.25f);
-            handle.setPadding(0, 0, dp(10), 0);
-            header.addView(handle);
-
-            TextView title = new TextView(requireContext());
             title.setText(item.title);
-            title.setTextSize(16);
-            title.setTypeface(null, Typeface.BOLD);
-            title.setLayoutParams(new LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-            header.addView(title);
+            icon.setImageResource(item.iconRes);
 
-            inner.addView(header);
+            dataLayout.removeAllViews();
 
-            // Body
             if ("info".equals(item.key)) {
-                TextView tv = new TextView(requireContext());
-                tv.setText(item.message);
-                tv.setAlpha(0.75f);
-                tv.setTextSize(13);
-                tv.setPadding(0, dp(10), 0, dp(2));
-                inner.addView(tv);
+                message.setVisibility(View.VISIBLE);
+                message.setText(item.message);
+                dataLayout.setVisibility(View.GONE);
+            } else {
+                message.setVisibility(View.GONE);
+                dataLayout.setVisibility(View.VISIBLE);
 
-                card.addView(inner);
-                return;
-            }
+                if (item.data != null) {
+                    int shown = 0;
+                    for (Map.Entry<String, String> entry : item.data.entrySet()) {
+                        if (shown >= 6) break;
+                        shown++;
 
-            View spacer = new View(requireContext());
-            spacer.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, dp(10)));
-            inner.addView(spacer);
+                        LinearLayout row = new LinearLayout(requireContext());
+                        row.setOrientation(LinearLayout.HORIZONTAL);
+                        row.setPadding(0, dp(4), 0, dp(4));
 
-            if (item.data != null) {
-                int shown = 0;
-                for (Map.Entry<String, String> entry : item.data.entrySet()) {
-                    if (shown >= 6) break; // keep cards compact
-                    shown++;
+                        TextView label = new TextView(requireContext());
+                        String rawKey = entry.getKey();
+                        int dot = rawKey.lastIndexOf('.');
+                        String labelText = dot >= 0 ? rawKey.substring(dot + 1) : rawKey;
+                        if (labelText.length() > 0) {
+                            labelText = labelText.substring(0, 1).toUpperCase()
+                                    + labelText.substring(1).replace("_", " ");
+                        }
+                        label.setText(labelText);
+                        label.setTextSize(12);
+                        label.setAlpha(0.7f);
+                        label.setMaxLines(1);
+                        label.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                        label.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1));
 
-                    LinearLayout row = new LinearLayout(requireContext());
-                    row.setOrientation(LinearLayout.HORIZONTAL);
-                    row.setPadding(0, dp(3), 0, dp(3));
+                        TextView value = new TextView(requireContext());
+                        value.setText(entry.getValue());
+                        value.setTextSize(13);
+                        value.setTypeface(null, Typeface.BOLD);
+                        value.setGravity(android.view.Gravity.END);
+                        value.setMaxLines(1);
+                        value.setEllipsize(android.text.TextUtils.TruncateAt.END);
 
-                    TextView label = new TextView(requireContext());
-                    String rawKey = entry.getKey();
-                    int dot = rawKey.lastIndexOf('.');
-                    String labelText = dot >= 0 ? rawKey.substring(dot + 1) : rawKey;
-                    if (labelText.length() > 0) {
-                        labelText = labelText.substring(0, 1).toUpperCase()
-                                + labelText.substring(1).replace("_", " ");
+                        row.addView(label);
+                        row.addView(value);
+                        dataLayout.addView(row);
                     }
-                    label.setText(labelText);
-                    label.setTextSize(13);
-                    label.setAlpha(0.65f);
-                    label.setLayoutParams(new LinearLayout.LayoutParams(
-                            0, LinearLayout.LayoutParams.WRAP_CONTENT, 1));
-
-                    TextView value = new TextView(requireContext());
-                    value.setText(entry.getValue());
-                    value.setTextSize(14);
-                    value.setTypeface(null, Typeface.BOLD);
-
-                    row.addView(label);
-                    row.addView(value);
-                    inner.addView(row);
                 }
             }
 
-            card.addView(inner);
+            setAnimation(holder.itemView, position);
+        }
+
+        private void setAnimation(View viewToAnimate, int position) {
+            if (position > lastPosition) {
+                Animation animation = android.view.animation.AnimationUtils.loadAnimation(requireContext(), android.R.anim.slide_in_left);
+                animation.setDuration(300);
+                viewToAnimate.startAnimation(animation);
+                lastPosition = position;
+            }
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(@NonNull VH holder) {
+            holder.itemView.clearAnimation();
         }
 
         @Override
