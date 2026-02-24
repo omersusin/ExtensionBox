@@ -201,6 +201,7 @@ fun KernelCard(
     reorderableItemScope: ReorderableCollectionItemScope,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val icon = ModuleRegistry.iconFor(key)
     val name = ModuleRegistry.nameFor(key)
     val primaryValue = data.values.firstOrNull() ?: ""
@@ -297,6 +298,22 @@ fun KernelCard(
                                 }
                                 if (rowItems.size == 1) Spacer(Modifier.weight(1f))
                             }
+                        }
+                    }
+                    if (key == "fap") {
+                        Spacer(Modifier.height(16.dp))
+                        Button(
+                            onClick = {
+                                val intent = Intent(context, MonitorService::class.java)
+                                    .setAction("com.extensionbox.app.FAP_INCREMENT")
+                                context.startService(intent)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Log Action")
                         }
                     }
                 }

@@ -24,6 +24,7 @@ class MonitorService : Service() {
     companion object {
         const val ACTION_STOP = "com.extensionbox.STOP"
         const val ACTION_RESET = "com.extensionbox.RESET"
+        const val ACTION_FAP_INCREMENT = "com.extensionbox.app.FAP_INCREMENT"
         private const val MONITOR_CH = "ebox_monitor"
         private const val ALERT_CH = "ebox_alerts"
         private const val NOTIF_ID = 1001
@@ -122,14 +123,19 @@ class MonitorService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == ACTION_STOP) {
-            stopSelf()
-            return START_NOT_STICKY
-        }
-        if (intent?.action == ACTION_RESET) {
-            serviceScope.launch(Dispatchers.IO) {
-                while (!initialized) delay(100)
-                resetAllModules()
+        when (intent?.action) {
+            ACTION_STOP -> {
+                stopSelf()
+                return START_NOT_STICKY
+            }
+            ACTION_RESET -> {
+                serviceScope.launch(Dispatchers.IO) {
+                    while (!initialized) delay(100)
+                    resetAllModules()
+                }
+            }
+            ACTION_FAP_INCREMENT -> {
+                getFapModule()?.increment()
             }
         }
         return START_STICKY
@@ -275,7 +281,7 @@ class MonitorService : Service() {
     private fun doDayRollover() {
         Prefs.setInt(this, "ulk_yesterday", Prefs.getInt(this, "ulk_today", 0))
         Prefs.setLong(this, "stp_yesterday", Prefs.getLong(this, "stp_today", 0))
-        Prefs.setLong(this, "scr_yesterday_on", Prefs.getLong(this, "scr_on_acc", 0))
+        Prefs.setLong(this, "scr_yesterday_on", Prefs.getLong(this, "scr_on_acc", 0L))
         Prefs.setInt(this, "fap_yesterday", Prefs.getInt(this, "fap_today", 0))
 
         Prefs.setInt(this, "ulk_today", 0)
