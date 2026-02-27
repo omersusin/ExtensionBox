@@ -257,9 +257,28 @@ fun AboutScreen() {
                     role = stringResource(id = R.string.contributor),
                     github = "https://github.com/omersusin",
                     onCli = { uriHandler.openUri(it) }
+
+
+                              HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                )
+                DeveloperItem(
+                    name = stringResource(id = R.string.pankaj_meharchandani),
+                    role = stringResource(id = R.string.developer),
+                    github = "https://github.com/Pankaj-Meharchandani",
+                    onCli = { uriHandler.openUri(it) }
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                DeveloperItem(
+                    name = stringResource(id = R.string.Juanma),
+                    role = stringResource(id = R.string.developer),
+                    github = "https://github.com/juanma0511",
+                    onCli = { uriHandler.openUri(it) }
                 )
             }
         }
+            
+    
 
         Spacer(modifier = Modifier.height(100.dp))
     }
