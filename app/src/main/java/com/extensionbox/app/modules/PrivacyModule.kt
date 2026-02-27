@@ -34,6 +34,10 @@ class PrivacyModule : Module {
         this.ctx = ctx
         this.sys = sys
         running = true
+        // Immediate fetch to show on dashboard without waiting for first tick
+        if (sys.isEnhanced()) {
+            lastEvents = sys.getPrivacyHistory(ctx)
+        }
     }
 
     override fun stop() {
@@ -57,9 +61,10 @@ class PrivacyModule : Module {
     }
 
     override fun detail(): String {
-        if (lastEvents.isEmpty()) return ctx?.getString(R.string.privacy_module_no_activity) ?: "No activity"
+        val c = ctx ?: return "No activity"
+        if (lastEvents.isEmpty()) return c.getString(R.string.privacy_module_no_activity)
         val sb = StringBuilder()
-        sb.append(ctx?.getString(R.string.privacy_module_recent_activity)).append("\n")
+        sb.append(c.getString(R.string.privacy_module_recent_activity)).append("\n")
         val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         lastEvents.take(5).forEach { 
             sb.append(" • ").append(it.appLabel).append(": ").append(it.opName)
@@ -70,10 +75,38 @@ class PrivacyModule : Module {
 
     override fun dataPoints(): LinkedHashMap<String, String> {
         val d = LinkedHashMap<String, String>()
-        lastEvents.take(5).forEachIndexed { index, event ->
-            d["privacy.event_$index"] = "${event.appLabel} accessed ${event.opName} at ${Date(event.lastAccessTime)}"
+        if (lastEvents.isNotEmpty()) {
+            val top = lastEvents.first()
+            d["privacy.last_app"] = top.appLabel
+            d["privacy.last_op"] = top.opName
+            d["privacy.count"] = lastEvents.size.toString()
         }
         return d
+    }
+
+    @androidx.compose.runtime.Composable
+    override fun dashboardContent(ctx: Context, sys: SystemAccess) {
+        if (lastEvents.isEmpty()) return
+        
+        Column(modifier = Modifier.padding(top = 8.dp)) {
+            lastEvents.take(3).forEach { event ->
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = event.appLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = event.opName,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
     }
 
     @Composable
