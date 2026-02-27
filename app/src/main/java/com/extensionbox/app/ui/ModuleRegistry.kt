@@ -29,7 +29,8 @@ object ModuleRegistry {
         ModuleDef("uptime", Icons.Rounded.History, "Uptime", "Device uptime since boot", false),
         ModuleDef("steps", Icons.AutoMirrored.Rounded.DirectionsWalk, "Step Counter", "Steps and distance", false),
         ModuleDef("speedtest", Icons.Rounded.Speed, "Speed Test", "Periodic download/upload speed test", false),
-        ModuleDef("habit", Icons.Rounded.Favorite, "Habit Tracker", "Self-monitoring counter & streak", false)
+        ModuleDef("habit", Icons.Rounded.Favorite, "Habit Tracker", "Self-monitoring counter & streak", false),
+        ModuleDef("privacy", Icons.Rounded.Shield, "Privacy Dashboard", "Permission usage and force-revoke tools", false)
     )
 
     fun keyAt(i: Int): String = MODULES[i].key
@@ -63,6 +64,7 @@ object ModuleRegistry {
             "steps" -> com.extensionbox.app.modules.StepModule()
             "speedtest" -> com.extensionbox.app.modules.SpeedTestModule()
             "habit" -> com.extensionbox.app.modules.HabitTrackerModule()
+            "privacy" -> com.extensionbox.app.modules.PrivacyModule()
             else -> null
         }
     }

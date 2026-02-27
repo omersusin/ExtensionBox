@@ -614,6 +614,125 @@ class SystemAccess(ctx: Context) {
         return list.filter { it.first.isNotEmpty() }.take(10)
     }
 
+    // --- Privacy & Permission Management ---
+
+    fun getPrivacyHistory(ctx: android.content.Context): List<com.extensionbox.app.ui.screens.PrivacyEvent> {
+        val cmd = "dumpsys appops"
+        val out = if (rootAvailable) shell.exec(cmd) else readFileShizukuShell(cmd)
+        if (out == null) return emptyList()
+
+        val events = mutableListOf<com.extensionbox.app.ui.screens.PrivacyEvent>()
+        val pm = ctx.packageManager
+        
+        // Target high-sensitivity ops
+        val targetOps = setOf("CAMERA", "RECORD_AUDIO", "FINE_LOCATION", "COARSE_LOCATION", "READ_CLIPBOARD")
+        
+        var currentPackage = ""
+        out.lines().forEach { line ->
+            val l = line.trim()
+            if (l.startsWith("Package ")) {
+                currentPackage = l.substringAfter("Package ").substringBefore(":")
+            } else if (currentPackage.isNotEmpty()) {
+                for (op in targetOps) {
+                    if (l.contains("$op: ")) {
+                        // Example line: CAMERA: allow; time=+1m32s321ms ago; duration=1s234ms
+                        val timeStr = Regex("""time=([^;]+)""").find(l)?.groupValues?.get(1)
+                        if (timeStr != null) {
+                            val lastAccess = parseRelativeTime(timeStr)
+                            val label = try { pm.getApplicationLabel(pm.getApplicationInfo(currentPackage, 0)).toString() } catch (_: Exception) { currentPackage }
+                            events.add(com.extensionbox.app.ui.screens.PrivacyEvent(
+                                packageName = currentPackage,
+                                appLabel = label,
+                                opName = op,
+                                lastAccessTime = lastAccess
+                            ))
+                        }
+                    }
+                }
+            }
+        }
+        return events.sortedByDescending { it.lastAccessTime }.take(20)
+    }
+
+    fun getAppPermissions(packageName: String): List<com.extensionbox.app.ui.screens.PermissionInfo> {
+        val cmd = "appops get $packageName"
+        val out = if (rootAvailable) shell.exec(cmd) else readFileShizukuShell(cmd)
+        if (out == null) return emptyList()
+
+        val perms = mutableListOf<com.extensionbox.app.ui.screens.PermissionInfo>()
+        out.lines().forEach { line ->
+            // Example: CAMERA: allow
+            if (line.contains(": ")) {
+                val parts = line.split(": ")
+                if (parts.size == 2) {
+                    val name = parts[0].trim()
+                    val modeStr = parts[1].trim()
+                    val mode = when (modeStr) {
+                        "allow" -> 0
+                        "ignore" -> 1
+                        "deny" -> 2
+                        else -> 3
+                    }
+                    perms.add(com.extensionbox.app.ui.screens.PermissionInfo(0, name, mode, modeStr))
+                }
+            }
+        }
+        return perms
+    }
+
+    fun setAppPermission(packageName: String, opName: String, mode: String): Boolean {
+        // mode should be "allow", "ignore", "deny", or "default"
+        val cmd = "appops set $packageName $opName $mode"
+        if (rootAvailable) {
+            shell.exec(cmd)
+            return true
+        }
+        if (shizukuAvailableNow()) {
+            try {
+                @Suppress("DEPRECATION")
+                val p = Shizuku.newProcess(arrayOf("sh", "-c", cmd), null, null)
+                p.waitFor()
+                return true
+            } catch (_: Exception) {}
+        }
+        return false
+    }
+
+    private fun readFileShizukuShell(cmd: String): String? {
+        if (!shizukuAvailableNow()) return null
+        return try {
+            @Suppress("DEPRECATION")
+            val p = Shizuku.newProcess(arrayOf("sh", "-c", cmd), null, null)
+            val br = BufferedReader(InputStreamReader(p.inputStream))
+            val sb = StringBuilder()
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                sb.append(line).append("\n")
+            }
+            br.close()
+            p.waitFor()
+            sb.toString()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun parseRelativeTime(rel: String): Long {
+        // Very basic parser for "time=+1m32s321ms ago"
+        val now = System.currentTimeMillis()
+        if (rel.contains("ago")) {
+            val clean = rel.replace("ago", "").replace("+", "").trim()
+            var offset = 0L
+            Regex("""(\d+)d""").find(clean)?.let { offset += it.groupValues[1].toLong() * 24 * 60 * 60 * 1000L }
+            Regex("""(\d+)h""").find(clean)?.let { offset += it.groupValues[1].toLong() * 60 * 60 * 1000L }
+            Regex("""(\d+)m(?!s)""").find(clean)?.let { offset += it.groupValues[1].toLong() * 60 * 1000L }
+            Regex("""(\d+)s""").find(clean)?.let { offset += it.groupValues[1].toLong() * 1000L }
+            Regex("""(\d+)ms""").find(clean)?.let { offset += it.groupValues[1].toLong() }
+            return now - offset
+        }
+        return now
+    }
+
     fun getCpuCoreCount(): Int {
         return try {
             Runtime.getRuntime().availableProcessors()

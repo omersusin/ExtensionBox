@@ -110,7 +110,8 @@ class MonitorService : Service() {
                 UptimeModule(),
                 StepModule(),
                 SpeedTestModule(),
-                HabitTrackerModule()
+                HabitTrackerModule(),
+                PrivacyModule()
             )
             
             initialized = true

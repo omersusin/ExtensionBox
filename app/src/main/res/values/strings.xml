@@ -337,5 +337,21 @@
     <string name="log_action">Log Action</string>
     <string name="no_available_settings">No available settings for this extension</string>
     <string name="extensionbox_config_json" translatable="false">extensionbox_config.json</string>
+    <string name="privacy_module_name">Privacy Dashboard</string>
+    <string name="privacy_module_description">Permission usage and force-revoke tools</string>
+    <string name="privacy_module_compact_text">Last: %1$s (%2$s)</string>
+    <string name="privacy_module_recent_activity">Recent Activity:</string>
+    <string name="privacy_module_no_activity">No recent sensitive activity found</string>
+    <string name="privacy_module_update_interval">Refresh Interval</string>
+    <string name="privacy_module_interval_formatter">%1$dm</string>
+    <string name="privacy_module_force_revoke">Force Revoke</string>
+    <string name="privacy_module_allow">Allow</string>
+    <string name="privacy_module_ignore">Ignore</string>
+    <string name="privacy_module_deny">Deny</string>
+    <string name="privacy_module_active_monitoring">Active Monitoring</string>
+    <string name="privacy_module_notify_on_access">Notify on Access</string>
+    <string name="privacy_module_access_alert_title">Privacy Access</string>
+    <string name="privacy_module_access_alert_content">%1$s is using %2$s</string>
+
     <string name="application_json" translatable="false">application/json</string>
 </resources>

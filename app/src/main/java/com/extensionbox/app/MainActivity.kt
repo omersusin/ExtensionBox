@@ -184,10 +184,12 @@ fun MainApp() {
             }
         ) {
             composable(Screen.Dashboard.route) { DashboardScreen(viewModel = dashboardViewModel, onModuleClick = { key ->
-                navController.navigate("module/$key")
+                if (key == "privacy") navController.navigate("privacy")
+                else navController.navigate("module/$key")
             }) }
             composable(Screen.Extensions.route) { ExtensionsScreen(onModuleClick = { key ->
-                navController.navigate("module/$key")
+                if (key == "privacy") navController.navigate("privacy")
+                else navController.navigate("module/$key")
             }, onDebloatClick = {
                 navController.navigate("debloat")
             }) }
@@ -198,6 +200,12 @@ fun MainApp() {
                 ModuleDetailScreen(moduleKey = key, viewModel = dashboardViewModel)
             }
             composable("debloat") { DebloatScreen() }
+            composable("privacy") {
+                val sys = dashboardViewModel.sysAccess.collectAsState().value
+                if (sys != null) {
+                    PrivacyScreen(sys = sys)
+                }
+            }
         }
     }
 }
