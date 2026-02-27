@@ -33,8 +33,24 @@ fun ModuleDetailScreen(moduleKey: String, viewModel: DashboardViewModel) {
     val dashData = viewModel.dashData.collectAsState().value
     val historyData = viewModel.historyData.collectAsState().value
     val sysAccess = viewModel.sysAccess.collectAsState().value
+    var fapLocalUpdateTick by remember { mutableStateOf(0) }
 
-    val data = dashData[moduleKey] ?: emptyMap()
+    val baseData = dashData[moduleKey] ?: emptyMap()
+    val data =
+            remember(moduleKey, baseData, fapLocalUpdateTick) {
+                if (moduleKey != "fap") {
+                    baseData
+                } else {
+                    baseData.toMutableMap().apply {
+                        put("fap.today", Prefs.getInt(context, "fap_today", 0).toString())
+                        put("fap.yesterday", Prefs.getInt(context, "fap_yesterday", 0).toString())
+                        val streak = Prefs.getInt(context, "fap_streak", 0)
+                        put("fap.streak", if (streak > 0) "${streak}d" else "0")
+                        put("fap.monthly", Prefs.getInt(context, "fap_monthly", 0).toString())
+                        put("fap.all_time", Prefs.getInt(context, "fap_all_time", 0).toString())
+                    }
+                }
+            }
     val history = historyData[moduleKey] ?: emptyList()
     val appUsageData = dashData["app_usage"] ?: emptyMap()
     val module = com.extensionbox.app.ui.ModuleRegistry.getModule(moduleKey)
@@ -175,6 +191,7 @@ fun ModuleDetailScreen(moduleKey: String, viewModel: DashboardViewModel) {
                                             Intent(context, MonitorService::class.java)
                                                     .setAction("com.extensionbox.app.FAP_INCREMENT")
                                     context.startService(intent)
+                                    fapLocalUpdateTick += 1
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = MaterialTheme.shapes.medium

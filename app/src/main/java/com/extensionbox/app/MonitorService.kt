@@ -178,10 +178,30 @@ class MonitorService : Service() {
                 }
             }
             ACTION_FAP_INCREMENT -> {
-                getFapModule()?.increment()
+                serviceScope.launch(Dispatchers.IO) {
+                    while (!initialized) delay(50)
+                    val module = getFapModule() ?: return@launch
+                    module.increment()
+                    publishModuleSnapshot(module, forceNotification = true)
+                }
             }
         }
         return START_STICKY
+    }
+
+    private suspend fun publishModuleSnapshot(module: Module, forceNotification: Boolean = false) {
+        if (!initialized || !module.alive()) return
+        val dp = module.dataPoints()
+        moduleData[module.key()] = dp
+        database.moduleDataDao().insert(ModuleDataEntity(moduleKey = module.key(), data = dp))
+        lastTickTime[module.key()] = SystemClock.elapsedRealtime()
+        if (forceNotification) {
+            lastNotifUpdateTime = 0L
+        }
+        withContext(Dispatchers.Main) { updateNotification() }
+        try {
+            ModuleWidgetProvider.updateAllWidgets(this@MonitorService)
+        } catch (ignored: Exception) {}
     }
 
     private fun checkBatteryFullReset() {
