@@ -135,6 +135,11 @@ fun ModuleDetailScreen(
                     if (hasSettings) {
                         module.settingsContent(context, sysAccess)
                     }
+
+                    ModuleNotificationDataPointSettings(
+                        moduleKey = moduleKey,
+                        dataKeys = (data.keys + module.dataPoints().keys).toList()
+                    )
                     
                     if (isFap) {
                         Button(
@@ -156,5 +161,56 @@ fun ModuleDetailScreen(
         }
         
         Spacer(modifier = Modifier.height(100.dp))
+    }
+}
+
+@Composable
+private fun ModuleNotificationDataPointSettings(
+    moduleKey: String,
+    dataKeys: List<String>
+) {
+    val context = LocalContext.current
+    val normalizedKeys = remember(dataKeys) {
+        dataKeys
+            .map { it.substringAfterLast('.') }
+            .distinct()
+            .sorted()
+    }
+
+    if (normalizedKeys.isEmpty()) return
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "Notification Fields",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        normalizedKeys.forEach { rawKey ->
+            var isVisible by remember(moduleKey, rawKey) {
+                mutableStateOf(Prefs.isModuleDataPointVisibleInNotif(context, moduleKey, rawKey))
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = rawKey.replace("_", " ").replaceFirstChar { it.uppercase() },
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Switch(
+                    checked = isVisible,
+                    onCheckedChange = { enabled ->
+                        isVisible = enabled
+                        Prefs.setModuleDataPointVisibleInNotif(context, moduleKey, rawKey, enabled)
+                    }
+                )
+            }
+        }
     }
 }

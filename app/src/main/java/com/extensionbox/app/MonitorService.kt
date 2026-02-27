@@ -8,16 +8,15 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.os.SystemClock
-import android.text.TextUtils
 import androidx.core.app.NotificationCompat
-import com.extensionbox.app.modules.*
-import com.extensionbox.app.widgets.ModuleWidgetProvider
-import kotlinx.coroutines.*
 import com.extensionbox.app.db.AppDatabase
 import com.extensionbox.app.db.ModuleDataEntity
+import com.extensionbox.app.modules.*
+import com.extensionbox.app.widgets.ModuleWidgetProvider
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
+import kotlinx.coroutines.*
 
 class MonitorService : Service() {
 
@@ -52,25 +51,29 @@ class MonitorService : Service() {
     private var syncJob: Job? = null
     private val moduleStates = ConcurrentHashMap<String, Boolean>()
 
-    private val powerReceiver = object : android.content.BroadcastReceiver() {
-        override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
-            when (intent?.action) {
-                Intent.ACTION_SCREEN_ON -> {
-                    isScreenOn = true
-                    lastNotifUpdateTime = 0L // Force update on screen on
-                    if (initialized) startTicker() // Immediate refresh on wake
-                }
-                Intent.ACTION_SCREEN_OFF -> {
-                    isScreenOn = false
-                }
-                Intent.ACTION_POWER_CONNECTED -> {
-                    if (Prefs.getBool(this@MonitorService, "scr_reset_plugged", false)) {
-                        resetAllModules()
+    private val powerReceiver =
+            object : android.content.BroadcastReceiver() {
+                override fun onReceive(
+                        context: android.content.Context?,
+                        intent: android.content.Intent?
+                ) {
+                    when (intent?.action) {
+                        Intent.ACTION_SCREEN_ON -> {
+                            isScreenOn = true
+                            lastNotifUpdateTime = 0L // Force update on screen on
+                            if (initialized) startTicker() // Immediate refresh on wake
+                        }
+                        Intent.ACTION_SCREEN_OFF -> {
+                            isScreenOn = false
+                        }
+                        Intent.ACTION_POWER_CONNECTED -> {
+                            if (Prefs.getBool(this@MonitorService, "scr_reset_plugged", false)) {
+                                resetAllModules()
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
 
     fun getFapModule(): FapCounterModule? {
         return if (initialized) modules.filterIsInstance<FapCounterModule>().firstOrNull() else null
@@ -83,77 +86,82 @@ class MonitorService : Service() {
 
         // Start foreground immediately to satisfy system requirements
         startForeground(NOTIF_ID, buildNotification())
-        
-        val filter = android.content.IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_POWER_CONNECTED)
-        }
+
+        val filter =
+                android.content.IntentFilter().apply {
+                    addAction(Intent.ACTION_SCREEN_ON)
+                    addAction(Intent.ACTION_SCREEN_OFF)
+                    addAction(Intent.ACTION_POWER_CONNECTED)
+                }
         registerReceiver(powerReceiver, filter)
 
         // Asynchronous heavy initialization
         serviceScope.launch(Dispatchers.IO) {
             database = AppDatabase.getDatabase(this@MonitorService)
             sysAccess = SystemAccess(this@MonitorService)
-            
-            modules = listOf(
-                BatteryModule(),
-                AppUsageModule(),
-                CpuModule(),
-                RamModule(),
-                SleepModule(),
-                NetworkModule(),
-                DataUsageModule(),
-                UnlockModule(),
-                StorageModule(),
-                ConnectionModule(),
-                UptimeModule(),
-                StepModule(),
-                SpeedTestModule(),
-                FapCounterModule()
-            )
-            
+
+            modules =
+                    listOf(
+                            BatteryModule(),
+                            AppUsageModule(),
+                            CpuModule(),
+                            RamModule(),
+                            SleepModule(),
+                            NetworkModule(),
+                            DataUsageModule(),
+                            UnlockModule(),
+                            StorageModule(),
+                            ConnectionModule(),
+                            UptimeModule(),
+                            StepModule(),
+                            SpeedTestModule(),
+                            FapCounterModule()
+                    )
+
             initialized = true
             startPreferenceObservation()
             startTicker()
         }
-        
+
         Prefs.setRunning(this, true)
     }
 
     private fun startPreferenceObservation() {
         syncJob?.cancel()
-        syncJob = serviceScope.launch(Dispatchers.IO) {
-            this@MonitorService.dataStore.data.collect { prefs ->
-                for (m in modules) {
-                    val key = "m_${m.key()}_enabled"
-                    val prefKey = androidx.datastore.preferences.core.booleanPreferencesKey(key)
-                    val isEnabled = prefs[prefKey] ?: m.defaultEnabled()
-                    moduleStates[m.key()] = isEnabled
-                    
-                    if (isEnabled && !m.alive()) {
-                        m.start(this@MonitorService, sysAccess)
-                        lastTickTime[m.key()] = 0L
-                    } else if (!isEnabled && m.alive()) {
-                        m.stop()
-                        moduleData.remove(m.key())
-                        lastTickTime.remove(m.key())
+        syncJob =
+                serviceScope.launch(Dispatchers.IO) {
+                    this@MonitorService.dataStore.data.collect { prefs ->
+                        for (m in modules) {
+                            val key = "m_${m.key()}_enabled"
+                            val prefKey =
+                                    androidx.datastore.preferences.core.booleanPreferencesKey(key)
+                            val isEnabled = prefs[prefKey] ?: m.defaultEnabled()
+                            moduleStates[m.key()] = isEnabled
+
+                            if (isEnabled && !m.alive()) {
+                                m.start(this@MonitorService, sysAccess)
+                                lastTickTime[m.key()] = 0L
+                            } else if (!isEnabled && m.alive()) {
+                                m.stop()
+                                moduleData.remove(m.key())
+                                lastTickTime.remove(m.key())
+                            }
+                        }
                     }
                 }
-            }
-        }
     }
 
     private fun startTicker() {
         if (!initialized) return
         tickerJob?.cancel()
-        tickerJob = serviceScope.launch(Dispatchers.IO) {
-            while (isActive) {
-                doTickCycle()
-                val delayMs = calculateNextDelay()
-                delay(delayMs)
-            }
-        }
+        tickerJob =
+                serviceScope.launch(Dispatchers.IO) {
+                    while (isActive) {
+                        doTickCycle()
+                        val delayMs = calculateNextDelay()
+                        delay(delayMs)
+                    }
+                }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -178,7 +186,7 @@ class MonitorService : Service() {
 
     private fun checkBatteryFullReset() {
         if (!initialized || !Prefs.getBool(this, "scr_reset_full", true)) return
-        
+
         val batMod = modules.filterIsInstance<BatteryModule>().firstOrNull() ?: return
         if (!batMod.alive()) return
 
@@ -208,17 +216,13 @@ class MonitorService : Service() {
         try {
             unregisterReceiver(powerReceiver)
         } catch (ignored: Exception) {}
-        
+
         if (::sysAccess.isInitialized) {
             sysAccess.onDestroy()
         }
-        
-        runBlocking {
-            withContext(Dispatchers.IO) {
-                if (initialized) stopAll()
-            }
-        }
-        
+
+        runBlocking { withContext(Dispatchers.IO) { if (initialized) stopAll() } }
+
         Prefs.setRunning(this, false)
         moduleData.clear()
         instance = null
@@ -227,59 +231,59 @@ class MonitorService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private suspend fun doTickCycle() = withContext(Dispatchers.IO) {
-        if (!initialized) return@withContext
-        checkRollover()
-        checkBatteryFullReset()
-        val now = SystemClock.elapsedRealtime()
-        var changed = false
-        val entitiesToInsert = mutableListOf<ModuleDataEntity>()
+    private suspend fun doTickCycle() =
+            withContext(Dispatchers.IO) {
+                if (!initialized) return@withContext
+                checkRollover()
+                checkBatteryFullReset()
+                val now = SystemClock.elapsedRealtime()
+                var changed = false
+                val entitiesToInsert = mutableListOf<ModuleDataEntity>()
 
-        for (m in modules) {
-            val isEnabled = moduleStates[m.key()] ?: m.defaultEnabled()
-            if (!isEnabled || !m.alive()) continue
-            
-            val last = lastTickTime[m.key()] ?: 0L
-            val interval = if (isScreenOn) m.tickIntervalMs() else m.tickIntervalMs() * 3
-            if (now - last >= interval) {
-                try {
-                    m.tick()
-                    m.checkAlerts(this@MonitorService)
-                    lastTickTime[m.key()] = now
-                    val dp = m.dataPoints()
-                    moduleData[m.key()] = dp
-                    
-                    // Collect for batch insert
-                    entitiesToInsert.add(ModuleDataEntity(moduleKey = m.key(), data = dp))
-                    
-                    changed = true
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                for (m in modules) {
+                    val isEnabled = moduleStates[m.key()] ?: m.defaultEnabled()
+                    if (!isEnabled || !m.alive()) continue
+
+                    val last = lastTickTime[m.key()] ?: 0L
+                    val interval = if (isScreenOn) m.tickIntervalMs() else m.tickIntervalMs() * 3
+                    if (now - last >= interval) {
+                        try {
+                            m.tick()
+                            m.checkAlerts(this@MonitorService)
+                            lastTickTime[m.key()] = now
+                            val dp = m.dataPoints()
+                            moduleData[m.key()] = dp
+
+                            // Collect for batch insert
+                            entitiesToInsert.add(ModuleDataEntity(moduleKey = m.key(), data = dp))
+
+                            changed = true
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
-            }
-        }
 
-        if (entitiesToInsert.isNotEmpty()) {
-            database.moduleDataDao().insertAll(entitiesToInsert)
-        }
-        
-        val notifInterval = Prefs.getLong(this@MonitorService, "notif_refresh_ms", 10000L)
-        if (changed && (now - lastNotifUpdateTime >= notifInterval)) {
-            lastNotifUpdateTime = now
-            withContext(Dispatchers.Main) {
-                updateNotification()
+                if (entitiesToInsert.isNotEmpty()) {
+                    database.moduleDataDao().insertAll(entitiesToInsert)
+                }
+
+                val notifInterval = Prefs.getLong(this@MonitorService, "notif_refresh_ms", 10000L)
+                if (changed && (now - lastNotifUpdateTime >= notifInterval)) {
+                    lastNotifUpdateTime = now
+                    withContext(Dispatchers.Main) { updateNotification() }
+                    // Throttled widget update (e.g. at least 30s)
+                    val lastWidgetUpdate =
+                            Prefs.getLong(this@MonitorService, "last_widget_update_time", 0L)
+                    if (now - lastWidgetUpdate >= 30000L) {
+                        Prefs.setLong(this@MonitorService, "last_widget_update_time", now)
+                        try {
+                            ModuleWidgetProvider.updateAllWidgets(this@MonitorService)
+                        } catch (ignored: Exception) {}
+                    }
+                }
+                checkNightSummary()
             }
-            // Throttled widget update (e.g. at least 30s)
-            val lastWidgetUpdate = Prefs.getLong(this@MonitorService, "last_widget_update_time", 0L)
-            if (now - lastWidgetUpdate >= 30000L) {
-                Prefs.setLong(this@MonitorService, "last_widget_update_time", now)
-                try {
-                    ModuleWidgetProvider.updateAllWidgets(this@MonitorService)
-                } catch (ignored: Exception) {}
-            }
-        }
-        checkNightSummary()
-    }
 
     private fun checkRollover() {
         if (!initialized) return
@@ -374,51 +378,76 @@ class MonitorService : Service() {
 
     private fun createChannels() {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val monCh = NotificationChannel(MONITOR_CH, "Extension Box Monitor", NotificationManager.IMPORTANCE_LOW).apply {
-            setShowBadge(false)
-            enableVibration(false)
-            setSound(null, null)
-        }
+        val monCh =
+                NotificationChannel(
+                                MONITOR_CH,
+                                "Extension Box Monitor",
+                                NotificationManager.IMPORTANCE_LOW
+                        )
+                        .apply {
+                            setShowBadge(false)
+                            enableVibration(false)
+                            setSound(null, null)
+                        }
         nm.createNotificationChannel(monCh)
-        val alertCh = NotificationChannel(ALERT_CH, "Extension Box Alerts", NotificationManager.IMPORTANCE_HIGH)
+        val alertCh =
+                NotificationChannel(
+                        ALERT_CH,
+                        "Extension Box Alerts",
+                        NotificationManager.IMPORTANCE_HIGH
+                )
         nm.createNotificationChannel(alertCh)
     }
 
     private fun buildNotification(): Notification {
         val openIntent = Intent(this, MainActivity::class.java)
-        val openPi = PendingIntent.getActivity(this, 0, openIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        
+        val openPi =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        openIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+
         val stopIntent = Intent(this, MonitorService::class.java).setAction(ACTION_STOP)
-        val stopPi = PendingIntent.getService(this, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val stopPi =
+                PendingIntent.getService(
+                        this,
+                        1,
+                        stopIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
 
         val isDismissible = Prefs.getBool(this, "notif_dismissible", false)
         val bigText = NotificationCompat.BigTextStyle().bigText(buildExpanded())
 
         return NotificationCompat.Builder(this, MONITOR_CH)
-            .setSmallIcon(R.drawable.ic_notif)
-            .setContentTitle(buildTitle())
-            .setContentText(buildCompact())
-            .setStyle(bigText)
-            .setOngoing(!isDismissible)
-            .setDeleteIntent(if (isDismissible) stopPi else null)
-            .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_STATUS)
-            .setContentIntent(openPi)
-            .addAction(0, "■ Stop", stopPi)
-            .setShowWhen(false)
-            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
-            .build()
+                .setSmallIcon(R.drawable.ic_notif)
+                .setContentTitle(buildTitle())
+                .setContentText(buildCompact())
+                .setStyle(bigText)
+                .setOngoing(!isDismissible)
+                .setDeleteIntent(if (isDismissible) stopPi else null)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setCategory(NotificationCompat.CATEGORY_STATUS)
+                .setContentIntent(openPi)
+                .addAction(0, "■ Stop", stopPi)
+                .setShowWhen(false)
+                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+                .build()
     }
 
     private fun buildTitle(): String {
         if (!::modules.isInitialized) return "Extension Box"
         val contextAware = Prefs.getBool(this, "notif_context_aware", true)
-        val batMod = modules.filterIsInstance<BatteryModule>().firstOrNull() ?: return "Extension Box"
+        val batMod =
+                modules.filterIsInstance<BatteryModule>().firstOrNull() ?: return "Extension Box"
         if (!batMod.alive()) return "Extension Box"
 
         val lvl = batMod.getLevel()
-        return if (contextAware && lvl <= 15) "⚠ Extension Box • $lvl% Low!" else "Extension Box • $lvl%"
+        return if (contextAware && lvl <= 15) "⚠ Extension Box • $lvl% Low!"
+        else "Extension Box • $lvl%"
     }
 
     private fun buildCompact(): String {
@@ -448,8 +477,11 @@ class MonitorService : Service() {
     private fun buildExpanded(): String {
         if (!::modules.isInitialized) return "Starting..."
         val layoutStyle = Prefs.getString(this, "notif_layout_style", "LIST") ?: "LIST"
-        val alive = getAliveModulesSorted()
-        
+        val alive =
+                getAliveModulesSorted()
+                        .map { module -> module to getVisibleNotificationDataPoints(module) }
+                        .filter { it.second.isNotEmpty() }
+
         if (alive.isEmpty()) return "Enable extensions from the app"
 
         return when (layoutStyle) {
@@ -459,26 +491,81 @@ class MonitorService : Service() {
                     val m1 = alive[i]
                     val m2 = if (i + 1 < alive.size) alive[i + 1] else null
                     if (m2 != null) {
-                        lines.add("• ${m1.name().take(8)}: ${m1.compact()} | ${m2.name().take(8)}: ${m2.compact()}")
+                        val left = renderDataPointsInline(m1.second, 1)
+                        val right = renderDataPointsInline(m2.second, 1)
+                        lines.add("• ${m1.first.name().take(8)}: $left")
+                        lines.add("• ${m2.first.name().take(8)}: $right")
                     } else {
-                        lines.add("• ${m1.name()}: ${m1.compact()}")
+                        lines.add("• ${m1.first.name()}: ${renderDataPointsInline(m1.second, 2)}")
                     }
                 }
                 lines.joinToString("\n")
             }
             "COMPACT" -> {
-                alive.joinToString("  •  ") { m -> m.compact() }
+                alive.joinToString("  •  ") { moduleAndPoints ->
+                    "${moduleAndPoints.first.name()}: ${renderDataPointsInline(moduleAndPoints.second, 1)}"
+                }
             }
             else -> { // LIST
-                val compactStyle = Prefs.getBool(this, "notif_compact_style", true)
-                val lines = if (compactStyle) {
-                    alive.map { m -> "• ${m.name()}: ${m.compact()}" }
-                } else {
-                    alive.map { m -> m.detail() }
-                }
+                val lines =
+                        alive.flatMap { moduleAndPoints ->
+                            buildAdaptiveModuleLines(
+                                    moduleAndPoints.first.name(),
+                                    moduleAndPoints.second
+                            )
+                        }
                 lines.joinToString("\n")
             }
         }
+    }
+
+    private fun getVisibleNotificationDataPoints(module: Module): List<Pair<String, String>> {
+        val points = moduleData[module.key()] ?: module.dataPoints()
+        if (points.isEmpty()) return emptyList()
+        return points.entries.mapNotNull { entry ->
+            val rawKey = entry.key.substringAfterLast('.')
+            val visible = Prefs.isModuleDataPointVisibleInNotif(this, module.key(), rawKey)
+            if (!visible) {
+                null
+            } else {
+                val label = rawKey.replace("_", " ").replaceFirstChar { it.uppercase() }
+                label to entry.value
+            }
+        }
+    }
+
+    private fun renderDataPointsInline(
+            points: List<Pair<String, String>>,
+            maxItems: Int = Int.MAX_VALUE
+    ): String {
+        return points.take(maxItems).joinToString(" • ") { pair -> "${pair.first}: ${pair.second}" }
+    }
+
+    private fun buildAdaptiveModuleLines(
+            moduleName: String,
+            points: List<Pair<String, String>>
+    ): List<String> {
+        val lines = mutableListOf<String>()
+        lines.add("• $moduleName")
+        var index = 0
+        val pairThreshold = 46
+
+        while (index < points.size) {
+            val current = "${points[index].first}: ${points[index].second}"
+            if (index + 1 < points.size) {
+                val next = "${points[index + 1].first}: ${points[index + 1].second}"
+                val candidate = "$current  •  $next"
+                if (candidate.length <= pairThreshold) {
+                    lines.add("  $candidate")
+                    index += 2
+                    continue
+                }
+            }
+            lines.add("  $current")
+            index += 1
+        }
+
+        return lines
     }
 
     private fun getAliveModulesSorted(): List<Module> {
@@ -545,24 +632,23 @@ class MonitorService : Service() {
 
         try {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-            val n = NotificationCompat.Builder(this, ALERT_CH)
-                .setSmallIcon(R.drawable.ic_notif)
-                .setContentTitle("🌙 Daily Summary")
-                .setContentText(bodyStr)
-                .setStyle(NotificationCompat.BigTextStyle().bigText(bodyStr))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .build()
+            val n =
+                    NotificationCompat.Builder(this, ALERT_CH)
+                            .setSmallIcon(R.drawable.ic_notif)
+                            .setContentTitle("🌙 Daily Summary")
+                            .setContentText(bodyStr)
+                            .setStyle(NotificationCompat.BigTextStyle().bigText(bodyStr))
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setAutoCancel(true)
+                            .build()
             nm.notify(NIGHT_SUMMARY_ID, n)
-        } catch (ignored: Exception) {
-        }
+        } catch (ignored: Exception) {}
     }
 
     private fun updateNotification() {
         try {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             nm.notify(NOTIF_ID, buildNotification())
-        } catch (ignored: Exception) {
-        }
+        } catch (ignored: Exception) {}
     }
 }

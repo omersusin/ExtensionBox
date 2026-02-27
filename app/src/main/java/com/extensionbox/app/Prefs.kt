@@ -19,6 +19,10 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
 
 object Prefs {
 
+    private fun sanitizeDataPointKey(value: String): String {
+        return value.lowercase().replace(Regex("[^a-z0-9]+"), "_").trim('_')
+    }
+
     // --- Synchronous Getters (Legacy bridge, uses runBlocking) ---
     // Note: In 2026 practice, we should migrate callers to observe flows or use suspended functions.
     // This bridge allows the app to function while we refactor.
@@ -108,6 +112,18 @@ object Prefs {
 
     fun setModuleVisibleInNotif(c: Context, key: String, value: Boolean) = runBlocking {
         val prefKey = booleanPreferencesKey("notif_m_${key}_visible")
+        c.dataStore.edit { it[prefKey] = value }
+    }
+
+    fun isModuleDataPointVisibleInNotif(c: Context, moduleKey: String, dataPointKey: String): Boolean = runBlocking {
+        val safeKey = sanitizeDataPointKey(dataPointKey)
+        val prefKey = booleanPreferencesKey("notif_dp_${moduleKey}_${safeKey}_visible")
+        c.dataStore.data.map { it[prefKey] ?: true }.first()
+    }
+
+    fun setModuleDataPointVisibleInNotif(c: Context, moduleKey: String, dataPointKey: String, value: Boolean) = runBlocking {
+        val safeKey = sanitizeDataPointKey(dataPointKey)
+        val prefKey = booleanPreferencesKey("notif_dp_${moduleKey}_${safeKey}_visible")
         c.dataStore.edit { it[prefKey] = value }
     }
 
