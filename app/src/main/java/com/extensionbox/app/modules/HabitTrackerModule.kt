@@ -1,6 +1,13 @@
 package com.extensionbox.app.modules
 
 import android.content.Context
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.extensionbox.app.Prefs
 import com.extensionbox.app.R
 import com.extensionbox.app.SystemAccess
@@ -8,22 +15,26 @@ import java.util.*
 
 class HabitTrackerModule : Module {
     private var ctx: Context? = null
+    private var running = false
 
     override fun key(): String = "habit"
     override fun name(): String = ctx?.getString(R.string.hab_counter_module_name) ?: "Habit Tracker"
     override fun description(): String = ctx?.getString(R.string.hab_counter_module_description) ?: "Self-monitoring counter & streak tracker"
     override fun defaultEnabled(): Boolean = false
-    override fun alive(): Boolean = true
+    override fun alive(): Boolean = running
     override fun priority(): Int = 85
 
     override fun tickIntervalMs(): Int = ctx?.let { Prefs.getInt(it, "hab_interval", 60000) } ?: 60000
 
     override fun start(ctx: Context, sys: SystemAccess) {
         this.ctx = ctx
+        running = true
         checkRollover()
     }
 
-    override fun stop() {}
+    override fun stop() {
+        running = false
+    }
 
     override fun tick() {
         checkRollover()
@@ -116,6 +127,31 @@ class HabitTrackerModule : Module {
         d["habit.monthly"] = Prefs.getInt(c, "hab_monthly", 0).toString()
         d["habit.all_time"] = Prefs.getInt(c, "hab_all_time", 0).toString()
         return d
+    }
+
+    @Composable
+    override fun dashboardContent(ctx: Context, sys: SystemAccess) {
+        Button(
+            onClick = {
+                val intent = android.content.Intent(ctx, com.extensionbox.app.MonitorService::class.java)
+                    .setAction(com.extensionbox.app.MonitorService.ACTION_HABIT_INCREMENT)
+                ctx.startService(intent)
+            },
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            shape = MaterialTheme.shapes.small,
+            contentPadding = PaddingValues(vertical = 4.dp)
+        ) {
+            Icon(
+                Icons.Default.Add, 
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                ctx.getString(R.string.log_action),
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
     }
 
     override fun checkAlerts(ctx: Context) {
