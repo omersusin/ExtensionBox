@@ -127,7 +127,7 @@ object Prefs {
             it[longPreferencesKey("dat_daily_wifi")] = 0L
             it[longPreferencesKey("dat_daily_mobile")] = 0L
             it[longPreferencesKey("scr_on_acc")] = 0L
-            it[intPreferencesKey("fap_today")] = 0
+            it[intPreferencesKey("hab_today")] = 0
         }
     }
 

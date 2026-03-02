@@ -16,7 +16,31 @@ The primary objective of Extension Box is to offer a structured environment wher
 
 ---
 
-## Key Features
+## Core Architecture
+
+- Central `MonitorService` (Foreground Service)
+- Module registry system
+- Each module:
+  - Has its own key
+  - Has its own update interval
+  - Produces its own data block
+- Modules can be toggled on/off at runtime
+- Dashboard renders live module cards
+
+---
+
+## Current Features
+
+### 📲​ Debloater
+- Uninstall whatever app you want!
+- Every app is cataloged by colors and name if they can harm the system or no!
+
+### 🔋 Battery
+- Current (mA)
+- Power (W)
+- Temperature
+- Health
+- Voltage (when available)
 
 ### Power and Energy Management
 - Real-time current flow (mA) and power consumption (W)
@@ -75,9 +99,8 @@ The repository is integrated with GitHub Actions to automate the quality assuran
 
 ## System Requirements
 
-- **Minimum SDK:** API 26 (Android 8.0)
-- **Target SDK:** API 36
-- **Permissions:** Module-specific permissions are requested at runtime only when required.
+- Android 8.0+
+- Required permissions vary depending on enabled modules (Root/Shizuku)
 
 ---
 

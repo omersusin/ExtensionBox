@@ -21,11 +21,11 @@ class SleepModule : Module {
 
     override fun key(): String = "sleep"
     override fun name(): String = ctx?.getString(R.string.sleep_module_name) ?: "Deep Sleep"
-    override fun emoji(): String = "😴"
     override fun description(): String = ctx?.getString(R.string.sleep_module_description) ?: "CPU sleep vs awake ratio"
     override fun defaultEnabled(): Boolean = true
     override fun alive(): Boolean = running
     override fun priority(): Int = 30
+    override fun hasSettings(): Boolean = true
 
     override fun tickIntervalMs(): Int = ctx?.let { Prefs.getInt(it, "slp_interval", 30000) } ?: 30000
 
@@ -41,6 +41,16 @@ class SleepModule : Module {
     }
 
     override fun tick() {}
+
+    fun getDeepSleepMs(): Long {
+        val el = SystemClock.elapsedRealtime() - elapsedStart
+        val up = SystemClock.uptimeMillis() - uptimeStart
+        return max(0, el - up)
+    }
+    
+    fun getAwakeMs(): Long {
+        return SystemClock.uptimeMillis() - uptimeStart
+    }
 
     private fun deepPct(): Float {
         val el = SystemClock.elapsedRealtime() - elapsedStart

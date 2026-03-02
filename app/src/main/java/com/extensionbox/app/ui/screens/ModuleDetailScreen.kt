@@ -111,7 +111,10 @@ fun ModuleDetailScreen(
             }
         }
 
-        if (module != null && sysAccess != null) {
+        val hasSettings = module?.hasSettings() == true
+        val isHabit = moduleKey == "habit"
+
+        if (module != null && sysAccess != null && (hasSettings || isHabit)) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(28.dp),
@@ -129,13 +132,15 @@ fun ModuleDetailScreen(
                         )
                     }
                     
-                    module.settingsContent(context, sysAccess)
+                    if (hasSettings) {
+                        module.settingsContent(context, sysAccess)
+                    }
                     
-                    if (moduleKey == "fap") {
+                    if (isHabit) {
                         Button(
                             onClick = {
                                 val intent = Intent(context, MonitorService::class.java)
-                                    .setAction("com.extensionbox.app.FAP_INCREMENT")
+                                    .setAction(MonitorService.ACTION_HABIT_INCREMENT)
                                 context.startService(intent)
                             },
                             modifier = Modifier.fillMaxWidth(),

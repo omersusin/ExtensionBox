@@ -20,7 +20,6 @@ class UptimeModule : Module {
 
     override fun key(): String = "uptime"
     override fun name(): String = ctx?.getString(R.string.uptime_module_name) ?: "Uptime"
-    override fun emoji(): String = "⏱"
     override fun description(): String = ctx?.getString(R.string.uptime_module_description) ?: "Device uptime since boot"
     override fun defaultEnabled(): Boolean = false
     override fun alive(): Boolean = running

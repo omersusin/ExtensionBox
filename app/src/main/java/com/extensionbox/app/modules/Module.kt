@@ -7,7 +7,6 @@ import java.util.LinkedHashMap
 interface Module {
     fun key(): String
     fun name(): String
-    fun emoji(): String
     fun description(): String
     fun defaultEnabled(): Boolean
     fun start(ctx: Context, sys: SystemAccess)
@@ -20,6 +19,11 @@ interface Module {
     fun alive(): Boolean
     fun checkAlerts(ctx: Context)
     fun reset() {}
+
+    /**
+     * Whether this module has configuration settings.
+     */
+    fun hasSettings(): Boolean = false
 
     /**
      * Optional Compose UI content for the module's dashboard card.

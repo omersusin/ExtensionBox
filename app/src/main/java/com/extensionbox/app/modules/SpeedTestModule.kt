@@ -31,11 +31,11 @@ class SpeedTestModule : Module {
 
     override fun key(): String = "speedtest"
     override fun name(): String = ctx?.getString(R.string.speed_test_module_name) ?: "Speed Test"
-    override fun emoji(): String = "🏎"
     override fun description(): String = ctx?.getString(R.string.speed_test_module_description) ?: "Periodic download and upload speed test"
     override fun defaultEnabled(): Boolean = false
     override fun alive(): Boolean = running
     override fun priority(): Int = 95
+    override fun hasSettings(): Boolean = true
 
     override fun tickIntervalMs(): Int = ctx?.let { Prefs.getInt(it, "spd_interval", 60000) } ?: 60000
 

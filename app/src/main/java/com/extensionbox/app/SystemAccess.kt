@@ -380,6 +380,15 @@ class SystemAccess(ctx: Context) {
         }
     }
 
+    fun readRemainingCapacity(ctx: Context): Int {
+        return try {
+            val bm = ctx.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER) / 1000
+        } catch (e: Exception) {
+            -1
+        }
+    }
+
     fun readActualCapacity(): Int {
         if (!isEnhanced()) return -1
         val valStr = readSysFile("/sys/class/power_supply/battery/charge_full") ?: return -1
@@ -460,9 +469,21 @@ class SystemAccess(ctx: Context) {
         try {
             output.lines().forEach { line ->
                 val l = line.lowercase(java.util.Locale.US)
+                // New logic: detect total and idle to get reliable system-wide usage
+                if (l.contains("%cpu") && l.contains("%idle")) {
+                    val mTotal = Regex("""(\d+)%cpu""").find(l)
+                    val mIdle = Regex("""(\d+)%idle""").find(l)
+                    if (mTotal != null && mIdle != null) {
+                        val total = mTotal.groupValues[1].toFloat()
+                        val idle = mIdle.groupValues[1].toFloat()
+                        if (total > 0) {
+                            return ((total - idle) * 100f / total).coerceIn(0f, 100f)
+                        }
+                    }
+                }
+                
+                // Fallback to summing components
                 if (l.contains("user") && l.contains("sys")) {
-                    // Try parsing "400%cpu 14%user 0%nice 20%sys..."
-                    // or "User 12%, System 10%..."
                     return parseCpuFromTopLine(l)
                 }
             }
@@ -481,12 +502,59 @@ class SystemAccess(ctx: Context) {
                         if (m != null) total += m.groupValues[1].toFloat()
                     }
                 }
-                if (total > 0) return total
+                if (total > 0) {
+                    val count = getCpuCoreCount()
+                    // If total exceeds 100%, it's almost certainly per-core reporting (e.g. 800% for 8 cores)
+                    return if (total > 100f) (total / count).coerceIn(0f, 100f) else total
+                }
             }
             -1f
         } catch (ignored: Exception) {
             -1f
         }
+    }
+
+    fun getCpuClusterInfo(): List<Triple<String, String, Long>> {
+        val clusters = mutableListOf<Triple<String, String, Long>>()
+        val policyDirs = mutableListOf<String>()
+        
+        // Scan for policy directories (usually policy0, policy4, policy7, etc)
+        val out = if (rootAvailable) shell.exec("ls -d /sys/devices/system/cpu/cpufreq/policy*") else null
+        if (out != null && !out.contains("No such")) {
+            policyDirs.addAll(out.split(Regex("\\s+")).filter { it.isNotEmpty() })
+        } else {
+            // Fallback for non-root/shizuku (limited)
+            for (i in 0..7) {
+                val p = "/sys/devices/system/cpu/cpufreq/policy$i"
+                if (java.io.File(p).exists()) policyDirs.add(p)
+            }
+        }
+
+        val policyData = mutableListOf<Triple<String, String, Long>>()
+        for (dir in policyDirs) {
+            val gov = readSysFile("$dir/scaling_governor") ?: "unknown"
+            val maxFreq = readSysFile("$dir/cpuinfo_max_freq")?.toLongOrNull() ?: 0L
+            policyData.add(Triple(dir, gov, maxFreq))
+        }
+
+        // Sort by max frequency to identify Little, Big, Prime
+        policyData.sortBy { it.third }
+
+        policyData.forEachIndexed { index, triple ->
+            val label = when (policyData.size) {
+                1 -> "Cluster"
+                2 -> if (index == 0) "Little Cluster" else "Big Cluster"
+                3 -> when (index) {
+                    0 -> "Little Cluster"
+                    1 -> "Big Cluster"
+                    else -> "Prime Cluster"
+                }
+                else -> "Cluster $index"
+            }
+            clusters.add(Triple(label, triple.second, triple.third))
+        }
+
+        return clusters
     }
 
     fun getRunningProcesses(): List<Triple<String, String, String>> {
@@ -553,6 +621,125 @@ class SystemAccess(ctx: Context) {
             }
         } catch (ignored: Exception) {}
         return list.filter { it.first.isNotEmpty() }.take(10)
+    }
+
+    // --- Privacy & Permission Management ---
+
+    fun getPrivacyHistory(ctx: android.content.Context): List<com.extensionbox.app.ui.screens.PrivacyEvent> {
+        val cmd = "dumpsys appops"
+        val out = if (rootAvailable) shell.exec(cmd) else readFileShizukuShell(cmd)
+        if (out == null) return emptyList()
+
+        val events = mutableListOf<com.extensionbox.app.ui.screens.PrivacyEvent>()
+        val pm = ctx.packageManager
+        
+        // Target high-sensitivity ops
+        val targetOps = setOf("CAMERA", "RECORD_AUDIO", "FINE_LOCATION", "COARSE_LOCATION", "READ_CLIPBOARD")
+        
+        var currentPackage = ""
+        out.lines().forEach { line ->
+            val l = line.trim()
+            if (l.startsWith("Package ")) {
+                currentPackage = l.substringAfter("Package ").substringBefore(":")
+            } else if (currentPackage.isNotEmpty()) {
+                for (op in targetOps) {
+                    if (l.contains("$op: ")) {
+                        // Example line: CAMERA: allow; time=+1m32s321ms ago; duration=1s234ms
+                        val timeStr = Regex("""time=([^;]+)""").find(l)?.groupValues?.get(1)
+                        if (timeStr != null) {
+                            val lastAccess = parseRelativeTime(timeStr)
+                            val label = try { pm.getApplicationLabel(pm.getApplicationInfo(currentPackage, 0)).toString() } catch (_: Exception) { currentPackage }
+                            events.add(com.extensionbox.app.ui.screens.PrivacyEvent(
+                                packageName = currentPackage,
+                                appLabel = label,
+                                opName = op,
+                                lastAccessTime = lastAccess
+                            ))
+                        }
+                    }
+                }
+            }
+        }
+        return events.sortedByDescending { it.lastAccessTime }.take(20)
+    }
+
+    fun getAppPermissions(packageName: String): List<com.extensionbox.app.ui.screens.PermissionInfo> {
+        val cmd = "appops get $packageName"
+        val out = if (rootAvailable) shell.exec(cmd) else readFileShizukuShell(cmd)
+        if (out == null) return emptyList()
+
+        val perms = mutableListOf<com.extensionbox.app.ui.screens.PermissionInfo>()
+        out.lines().forEach { line ->
+            // Example: CAMERA: allow
+            if (line.contains(": ")) {
+                val parts = line.split(": ")
+                if (parts.size == 2) {
+                    val name = parts[0].trim()
+                    val modeStr = parts[1].trim()
+                    val mode = when (modeStr) {
+                        "allow" -> 0
+                        "ignore" -> 1
+                        "deny" -> 2
+                        else -> 3
+                    }
+                    perms.add(com.extensionbox.app.ui.screens.PermissionInfo(0, name, mode, modeStr))
+                }
+            }
+        }
+        return perms
+    }
+
+    fun setAppPermission(packageName: String, opName: String, mode: String): Boolean {
+        // mode should be "allow", "ignore", "deny", or "default"
+        val cmd = "appops set $packageName $opName $mode"
+        if (rootAvailable) {
+            shell.exec(cmd)
+            return true
+        }
+        if (shizukuAvailableNow()) {
+            try {
+                @Suppress("DEPRECATION")
+                val p = Shizuku.newProcess(arrayOf("sh", "-c", cmd), null, null)
+                p.waitFor()
+                return true
+            } catch (_: Exception) {}
+        }
+        return false
+    }
+
+    private fun readFileShizukuShell(cmd: String): String? {
+        if (!shizukuAvailableNow()) return null
+        return try {
+            @Suppress("DEPRECATION")
+            val p = Shizuku.newProcess(arrayOf("sh", "-c", cmd), null, null)
+            val br = BufferedReader(InputStreamReader(p.inputStream))
+            val sb = StringBuilder()
+            var line: String?
+            while (br.readLine().also { line = it } != null) {
+                sb.append(line).append("\n")
+            }
+            br.close()
+            p.waitFor()
+            sb.toString()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun parseRelativeTime(rel: String): Long {
+        // Very basic parser for "time=+1m32s321ms ago"
+        val now = System.currentTimeMillis()
+        if (rel.contains("ago")) {
+            val clean = rel.replace("ago", "").replace("+", "").trim()
+            var offset = 0L
+            Regex("""(\d+)d""").find(clean)?.let { offset += it.groupValues[1].toLong() * 24 * 60 * 60 * 1000L }
+            Regex("""(\d+)h""").find(clean)?.let { offset += it.groupValues[1].toLong() * 60 * 60 * 1000L }
+            Regex("""(\d+)m(?!s)""").find(clean)?.let { offset += it.groupValues[1].toLong() * 60 * 1000L }
+            Regex("""(\d+)s""").find(clean)?.let { offset += it.groupValues[1].toLong() * 1000L }
+            Regex("""(\d+)ms""").find(clean)?.let { offset += it.groupValues[1].toLong() }
+            return now - offset
+        }
+        return now
     }
 
     fun getCpuCoreCount(): Int {

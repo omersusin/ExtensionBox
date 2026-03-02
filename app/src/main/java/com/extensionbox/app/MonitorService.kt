@@ -16,6 +16,7 @@ import kotlinx.coroutines.*
 import com.extensionbox.app.db.AppDatabase
 import com.extensionbox.app.db.ModuleDataEntity
 import java.util.Calendar
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
@@ -24,7 +25,7 @@ class MonitorService : Service() {
     companion object {
         const val ACTION_STOP = "com.extensionbox.STOP"
         const val ACTION_RESET = "com.extensionbox.RESET"
-        const val ACTION_FAP_INCREMENT = "com.extensionbox.app.FAP_INCREMENT"
+        const val ACTION_HABIT_INCREMENT = "com.extensionbox.app.HABIT_INCREMENT"
         private const val MONITOR_CH = "ebox_monitor"
         private const val ALERT_CH = "ebox_alerts"
         private const val NOTIF_ID = 1001
@@ -72,8 +73,8 @@ class MonitorService : Service() {
         }
     }
 
-    fun getFapModule(): FapCounterModule? {
-        return if (initialized) modules.filterIsInstance<FapCounterModule>().firstOrNull() else null
+    fun getHabitModule(): HabitTrackerModule? {
+        return if (initialized) modules.filterIsInstance<HabitTrackerModule>().firstOrNull() else null
     }
 
     override fun onCreate() {
@@ -98,9 +99,9 @@ class MonitorService : Service() {
             
             modules = listOf(
                 BatteryModule(),
-                AppUsageModule(),
                 CpuModule(),
                 RamModule(),
+                AppUsageModule(),
                 SleepModule(),
                 NetworkModule(),
                 DataUsageModule(),
@@ -110,7 +111,8 @@ class MonitorService : Service() {
                 UptimeModule(),
                 StepModule(),
                 SpeedTestModule(),
-                FapCounterModule()
+                HabitTrackerModule(),
+                PrivacyModule()
             )
             
             initialized = true
@@ -169,8 +171,8 @@ class MonitorService : Service() {
                     resetAllModules()
                 }
             }
-            ACTION_FAP_INCREMENT -> {
-                getFapModule()?.increment()
+            ACTION_HABIT_INCREMENT -> {
+                getHabitModule()?.increment()
             }
         }
         return START_STICKY
@@ -326,7 +328,7 @@ class MonitorService : Service() {
         Prefs.setInt(this, "ulk_yesterday", Prefs.getInt(this, "ulk_today", 0))
         Prefs.setLong(this, "stp_yesterday", Prefs.getLong(this, "stp_today", 0))
         Prefs.setLong(this, "scr_yesterday_on", Prefs.getLong(this, "scr_on_acc", 0L))
-        Prefs.setInt(this, "fap_yesterday", Prefs.getInt(this, "fap_today", 0))
+        Prefs.setInt(this, "hab_yesterday", Prefs.getInt(this, "hab_today", 0))
 
         Prefs.setInt(this, "ulk_today", 0)
         Prefs.setLong(this, "stp_today", 0L)
@@ -334,7 +336,7 @@ class MonitorService : Service() {
         Prefs.setLong(this, "dat_daily_wifi", 0L)
         Prefs.setLong(this, "dat_daily_mobile", 0L)
         Prefs.setLong(this, "scr_on_acc", 0L)
-        Prefs.setInt(this, "fap_today", 0)
+        Prefs.setInt(this, "hab_today", 0)
     }
 
     private fun doMonthRollover() {
@@ -392,12 +394,17 @@ class MonitorService : Service() {
         val stopPi = PendingIntent.getService(this, 1, stopIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
 
         val isDismissible = Prefs.getBool(this, "notif_dismissible", false)
-        val bigText = NotificationCompat.BigTextStyle().bigText(buildExpanded())
+        val alive = getAliveModulesSorted()
+        val expandedContent = buildExpanded(alive)
+        val bigText = NotificationCompat.BigTextStyle().bigText(expandedContent)
+
+        // Collapse summary: show up to 3 non-battery modules to avoid duplication with title
+        val summary = alive.filter { it !is BatteryModule }.take(3).joinToString(" • ") { m -> m.compact() }
 
         return NotificationCompat.Builder(this, MONITOR_CH)
             .setSmallIcon(R.drawable.ic_notif)
             .setContentTitle(buildTitle())
-            .setContentText(buildCompact())
+            .setContentText(summary.ifEmpty { "Monitoring system performance" })
             .setStyle(bigText)
             .setOngoing(!isDismissible)
             .setDeleteIntent(if (isDismissible) stopPi else null)
@@ -414,43 +421,23 @@ class MonitorService : Service() {
     private fun buildTitle(): String {
         if (!::modules.isInitialized) return "Extension Box"
         val contextAware = Prefs.getBool(this, "notif_context_aware", true)
-        val batMod = modules.filterIsInstance<BatteryModule>().firstOrNull() ?: return "Extension Box"
-        if (!batMod.alive()) return "Extension Box"
-
-        val lvl = batMod.getLevel()
-        return if (contextAware && lvl <= 15) "⚠ Extension Box • $lvl% Low!" else "Extension Box • $lvl%"
+        val batMod = modules.filterIsInstance<BatteryModule>().firstOrNull()
+        if (batMod != null && batMod.alive()) {
+            val lvl = batMod.getLevel()
+            return if (contextAware && lvl <= 15) "Extension Box • $lvl% Low" else "Extension Box • $lvl%"
+        }
+        return "Extension Box • Active"
     }
 
-    private fun buildCompact(): String {
+    private fun buildExpanded(alive: List<Module>): String {
         if (!::modules.isInitialized) return "Starting..."
-        val contextAware = Prefs.getBool(this, "notif_context_aware", true)
-        val maxItems = Prefs.getInt(this, "notif_compact_items", 4)
-
-        val alive = getAliveModulesSorted()
-        val parts = alive.mapNotNull { m -> m.compact().takeIf { it.isNotEmpty() } }.take(maxItems)
-
-        if (parts.isEmpty()) return "All extensions disabled"
-
-        var base = parts.joinToString(" • ")
-        if (base.length > 60 && parts.size > 1) {
-            base = parts.take(parts.size - 1).joinToString(" • ") + " ..."
-        }
-
-        if (contextAware) {
-            val batMod = modules.filterIsInstance<BatteryModule>().firstOrNull()
-            if (batMod?.alive() == true && batMod.getLevel() <= 10) {
-                base += " • ⚡Charge!"
-            }
-        }
-        return base
-    }
-
-    private fun buildExpanded(): String {
-        if (!::modules.isInitialized) return "Starting..."
-        val layoutStyle = Prefs.getString(this, "notif_layout_style", "LIST") ?: "LIST"
-        val alive = getAliveModulesSorted()
+        val layoutStyle = Prefs.getString(this, "notif_layout_style", "PUZZLE") ?: "PUZZLE"
         
-        if (alive.isEmpty()) return "Enable extensions from the app"
+        if (layoutStyle == "PUZZLE") {
+            return buildPuzzleLayout(alive)
+        }
+
+        if (alive.isEmpty()) return "Enable extensions to see stats"
 
         return when (layoutStyle) {
             "GRID" -> {
@@ -459,26 +446,93 @@ class MonitorService : Service() {
                     val m1 = alive[i]
                     val m2 = if (i + 1 < alive.size) alive[i + 1] else null
                     if (m2 != null) {
-                        lines.add("• ${m1.name().take(8)}: ${m1.compact()} | ${m2.name().take(8)}: ${m2.compact()}")
+                        lines.add("${m1.name()}: ${m1.compact()} • ${m2.name()}: ${m2.compact()}")
                     } else {
-                        lines.add("• ${m1.name()}: ${m1.compact()}")
+                        lines.add("${m1.name()}: ${m1.compact()}")
                     }
                 }
                 lines.joinToString("\n")
             }
-            "COMPACT" -> {
-                alive.joinToString("  •  ") { m -> m.compact() }
-            }
             else -> { // LIST
-                val compactStyle = Prefs.getBool(this, "notif_compact_style", true)
-                val lines = if (compactStyle) {
-                    alive.map { m -> "• ${m.name()}: ${m.compact()}" }
-                } else {
-                    alive.map { m -> m.detail() }
-                }
-                lines.joinToString("\n")
+                alive.map { m -> "${m.name()}: ${m.compact()}" }.joinToString("\n")
             }
         }
+    }
+
+    private fun buildPuzzleLayout(alive: List<Module>): String {
+        val sb = StringBuilder()
+        val bat = modules.filterIsInstance<BatteryModule>().firstOrNull()
+        val slp = modules.filterIsInstance<SleepModule>().firstOrNull()
+        val net = modules.filterIsInstance<NetworkModule>().firstOrNull()
+
+        if (bat != null && bat.alive()) {
+            val ma = abs(bat.getCurrentMa())
+            val w = ma * bat.getVoltage() / 1_000_000f
+            val t = bat.getTemp() / 10f
+            val timeLeft = bat.getTimeLeft()
+            
+            // Now: 110 mA (0.5 W) • 37.0º • 3d 18h left
+            sb.append("Now: ").append(ma).append(" mA (")
+                .append(String.format(Locale.US, "%.1f W", w)).append(") • ")
+                .append(String.format(Locale.US, "%.1fº", t)).append(" • ")
+                .append(timeLeft).append("\n")
+
+            val on = bat.getTotalOn()
+            val off = bat.getTotalOff()
+            
+            if (on > 60000) {
+                val curOnDrain = if (bat.isScreenOn()) abs(bat.getPeriodStartLevel() - bat.getLevel()).toFloat() else 0f
+                val totalOnDrain = bat.getOnDrain() + curOnDrain
+                val rateOn = totalOnDrain / (on / 3600000f)
+                
+                val curOffDrain = if (!bat.isScreenOn()) abs(bat.getPeriodStartLevel() - bat.getLevel()).toFloat() else 0f
+                val totalOffDrain = bat.getOffDrain() + curOffDrain
+                val rateOff = if (off > 60000) totalOffDrain / (off / 3600000f) else 0f
+                
+                // Active: 0.0%/h • Idle: 0.0%/h
+                sb.append("Active: ").append(String.format(Locale.US, "%.1f%%/h", rateOn))
+                    .append(" • Idle: ").append(String.format(Locale.US, "%.1f%%/h", rateOff)).append("\n")
+                
+                // Screen On: 48s • 0.0% (5 mAh)
+                val design = sysAccess.readDesignCapacity(this)
+                val mahOn = (totalOnDrain * design / 100).toInt()
+                sb.append("Screen On: ").append(Fmt.duration(on)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", totalOnDrain)).append(" (")
+                    .append(mahOn).append(" mAh)\n")
+                
+                // Screen Off: 22s • 0.0% (1 mAh)
+                val mahOff = (totalOffDrain * design / 100).toInt()
+                sb.append("Screen Off: ").append(Fmt.duration(off)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", totalOffDrain)).append(" (")
+                    .append(mahOff).append(" mAh)\n")
+            }
+        }
+
+        if (slp != null && slp.alive()) {
+            val ds = slp.getDeepSleepMs()
+            val up = slp.getAwakeMs()
+            val total = ds + up
+            if (total > 0) {
+                val dsPct = ds * 100f / total
+                val upPct = up * 100f / total
+                // Deep sleep: 16s • 72.9%
+                sb.append("Deep sleep: ").append(Fmt.duration(ds)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", dsPct)).append("\n")
+                // Awake: 5s • 27.1%
+                sb.append("Awake: ").append(Fmt.duration(up)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", upPct)).append("\n")
+            }
+        }
+
+        if (net != null && net.alive()) {
+            val dl = net.getDlSpeed()
+            val ul = net.getUlSpeed()
+            // Download: 1.5 MB/s • Upload 0.4 MB/s
+            sb.append("Download: ").append(Fmt.speed(dl)).append(" • Upload ")
+                .append(Fmt.speed(ul))
+        }
+
+        return sb.toString().trim()
     }
 
     private fun getAliveModulesSorted(): List<Module> {
@@ -518,26 +572,26 @@ class MonitorService : Service() {
         val unlocks = Prefs.getInt(this, "ulk_today", 0)
         val screenMs = Prefs.getLong(this, "scr_on_acc", 0L)
         val steps = Prefs.getLong(this, "stp_today", 0L)
-        val faps = Prefs.getInt(this, "fap_today", 0)
+        val habs = Prefs.getInt(this, "hab_today", 0)
 
         val screenMin = (screenMs / 60000).toInt()
         val screenH = screenMin / 60
         val screenM = screenMin % 60
 
         val body = StringBuilder()
-        body.append("📱 Screen: ${screenH}h ${screenM}m")
-        body.append("  •  🔓 $unlocks unlocks")
-        if (steps > 0) body.append("  •  👣 $steps steps")
-        if (faps > 0) body.append("  •  Favorite $faps") // Registration says Favorite emoji
+        body.append("Screen: ${screenH}h ${screenM}m")
+        body.append(" • $unlocks unlocks")
+        if (steps > 0) body.append(" • $steps steps")
+        if (habs > 0) body.append(" • Habit Tracker: $habs")
 
         val ydUnlocks = Prefs.getInt(this, "ulk_yesterday", 0)
         if (ydUnlocks > 0) {
             val diff = unlocks - ydUnlocks
             val pct = abs(diff * 100 / ydUnlocks)
             if (diff < 0) {
-                body.append("\n🎉 $pct% fewer unlocks than yesterday!")
+                body.append("\n$pct% fewer unlocks than yesterday")
             } else if (diff > 0) {
-                body.append("\n📈 $pct% more unlocks than yesterday")
+                body.append("\n$pct% more unlocks than yesterday")
             }
         }
 
@@ -547,7 +601,7 @@ class MonitorService : Service() {
             val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             val n = NotificationCompat.Builder(this, ALERT_CH)
                 .setSmallIcon(R.drawable.ic_notif)
-                .setContentTitle("🌙 Daily Summary")
+                .setContentTitle("Daily Summary")
                 .setContentText(bodyStr)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(bodyStr))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)

@@ -252,10 +252,20 @@ fun AboutScreen() {
                 )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                
                 DeveloperItem(
                     name = stringResource(id = R.string.omer),
                     role = stringResource(id = R.string.contributor),
                     github = "https://github.com/omersusin",
+                    onCli = { uriHandler.openUri(it) }
+                )
+                
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                
+                DeveloperItem(
+                    name = stringResource(id = R.string.juanma),
+                    role = stringResource(id = R.string.developer),
+                    github = "https://github.com/juanma0511",
                     onCli = { uriHandler.openUri(it) }
                 )
             }

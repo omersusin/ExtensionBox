@@ -66,11 +66,13 @@ class BatteryModule : Module {
 
     override fun key(): String = "battery"
     override fun name(): String = ctx?.getString(R.string.battery_module_name) ?: "Battery & Screen"
-    override fun emoji(): String = "🔋"
     override fun description(): String = ctx?.getString(R.string.battery_module_description) ?: "Battery health, power and screen usage"
-    override fun defaultEnabled(): Boolean = true
-    override fun alive(): Boolean = running
-    @Composable
+        override fun defaultEnabled(): Boolean = true
+        override fun alive(): Boolean = running
+        override fun hasSettings(): Boolean = true
+    
+        @Composable
+    
     override fun composableContent(ctx: Context, sys: SystemAccess) {
         // High level overview for the detail screen
         val ma = if (currentMa >= 0) currentMa else abs(currentMa)
@@ -397,6 +399,10 @@ class BatteryModule : Module {
         }
 
         sb.append("   ").append(timeLeft())
+        val remMah = sys?.readRemainingCapacity(c) ?: -1
+        if (remMah > 0) {
+            sb.append(" • ").append(remMah).append(" mAh")
+        }
         if (isCharging()) {
             sb.append(c.getString(R.string.battery_module_time_left_separator)).append(chargeType())
         }
@@ -446,17 +452,27 @@ class BatteryModule : Module {
         val t = temp / 10f
 
         d["battery.level"] = "$level%"
-        d["battery.current"] = "$ma mA"
+        
+        if (isCharging()) {
+            d["battery.charge_current"] = "$ma mA"
+            d["battery.charger_type"] = pluggedType()
+            d["battery.charge_speed"] = chargeType()
+        } else {
+            d["battery.discharge_rate"] = "$ma mA"
+        }
+        
         d["battery.power"] = String.format(Locale.US, "%.1f W", w)
         d["battery.temp"] = Fmt.temp(t)
         d["battery.voltage"] = String.format(Locale.US, "%.2fV", voltage / 1000f)
+        
+        val remMah = sys?.readRemainingCapacity(c) ?: -1
+        if (remMah > 0) {
+            d["battery.remaining_capacity"] = "$remMah mAh"
+        }
+        
         d["battery.health"] = healthStr()
         d["battery.status"] = statusStr()
         d["battery.time_left"] = timeLeft()
-
-        if (isCharging()) {
-            d["battery.charge_type"] = chargeType()
-        }
 
         d["battery.design_capacity"] = if (sys != null && ctx != null) "${sys?.readDesignCapacity(ctx!!)} mAh" else "$designCap mAh"
         d["battery.technology"] = technology ?: c.getString(R.string.battery_module_not_available)
@@ -538,14 +554,36 @@ class BatteryModule : Module {
 
     fun isFull(): Boolean = status == BatteryManager.BATTERY_STATUS_FULL || level >= 100
 
-    private fun isCharging(): Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
+    fun isCharging(): Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
+    
+    fun getCurrentMa(): Int = currentMa
+    
+    fun getVoltage(): Int = voltage
+    
+    fun getTemp(): Int = temp
+    
+    fun getTimeLeft(): String = timeLeft()
+    
+    fun getOnDrain(): Float = onDrain
+    
+    fun getOffDrain(): Float = offDrain
+    
+    fun getOnAccMs(): Long = onAccMs
+    
+    fun getOffAccMs(): Long = offAccMs
+    
+    fun getPeriodStartLevel(): Int = periodStartLevel
+    
+    fun getPeriodStart(): Long = periodStart
+    
+    fun isScreenOn(): Boolean = screenOn
 
-    private fun getTotalOn(): Long {
+    fun getTotalOn(): Long {
         val now = android.os.SystemClock.elapsedRealtime()
         return onAccMs + if (screenOn) (now - periodStart) else 0
     }
 
-    private fun getTotalOff(): Long {
+    fun getTotalOff(): Long {
         val now = android.os.SystemClock.elapsedRealtime()
         return offAccMs + if (!screenOn) (now - periodStart) else 0
     }
@@ -576,6 +614,16 @@ class BatteryModule : Module {
             d > 0 -> String.format(Locale.US, c.getString(R.string.battery_module_hours_format_days), d, h)
             h > 0 -> String.format(Locale.US, c.getString(R.string.battery_module_hours_format_hours), h, m)
             else -> String.format(Locale.US, c.getString(R.string.battery_module_hours_format_minutes), m)
+        }
+    }
+
+    private fun pluggedType(): String {
+        val c = ctx ?: return ""
+        return when (plugged) {
+            BatteryManager.BATTERY_PLUGGED_AC -> c.getString(R.string.battery_module_plugged_ac)
+            BatteryManager.BATTERY_PLUGGED_USB -> c.getString(R.string.battery_module_plugged_usb)
+            BatteryManager.BATTERY_PLUGGED_WIRELESS -> c.getString(R.string.battery_module_plugged_wireless)
+            else -> c.getString(R.string.battery_module_not_available)
         }
     }
 

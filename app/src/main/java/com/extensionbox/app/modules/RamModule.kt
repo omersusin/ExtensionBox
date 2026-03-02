@@ -32,11 +32,11 @@ class RamModule : Module {
 
     override fun key(): String = "ram"
     override fun name(): String = ctx?.getString(R.string.ram_module_name) ?: "RAM"
-    override fun emoji(): String = "🧠"
     override fun description(): String = ctx?.getString(R.string.ram_module_description) ?: "Memory status and running processes"
     override fun defaultEnabled(): Boolean = true
     override fun alive(): Boolean = running
     override fun priority(): Int = 16
+    override fun hasSettings(): Boolean = true
 
     override fun tickIntervalMs(): Int = ctx?.let { Prefs.getInt(it, "ram_interval", 5000) } ?: 5000
 

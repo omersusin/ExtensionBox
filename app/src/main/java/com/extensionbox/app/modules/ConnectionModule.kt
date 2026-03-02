@@ -26,7 +26,6 @@ class ConnectionModule : Module {
 
     override fun key(): String = "connection"
     override fun name(): String = ctx?.getString(R.string.connection_module_name) ?: "Connection Info"
-    override fun emoji(): String = "📡"
     override fun description(): String = ctx?.getString(R.string.connection_module_description) ?: "WiFi, cellular, VPN status"
     override fun defaultEnabled(): Boolean = false
     override fun alive(): Boolean = running

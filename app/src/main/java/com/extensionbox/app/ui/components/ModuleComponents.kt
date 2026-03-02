@@ -95,7 +95,7 @@ fun extractPoints(key: String, history: List<ModuleDataEntity>): List<Float> {
             "uptime"     -> entity.data["uptime.duration"]?.let { parseDurationToMinutes(it) }
             "steps"      -> entity.data["steps.today"]?.replace(",", "")?.toFloatOrNull()
             "speedtest"  -> entity.data["speedtest.download"]?.substringBefore(" ")?.toFloatOrNull()
-            "fap"        -> entity.data["fap.today"]?.toFloatOrNull()
+            "habit"      -> entity.data["habit.today"]?.toFloatOrNull()
             else         -> null
         }
     }

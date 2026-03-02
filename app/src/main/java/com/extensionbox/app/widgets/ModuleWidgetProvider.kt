@@ -32,7 +32,7 @@ open class ModuleWidgetProvider : AppWidgetProvider() {
     class UptimeWidgetProvider : ModuleWidgetProvider()
     class StepWidgetProvider : ModuleWidgetProvider()
     class SpeedTestWidgetProvider : ModuleWidgetProvider()
-    class FapWidgetProvider : ModuleWidgetProvider()
+    class HabitWidgetProvider : ModuleWidgetProvider()
     class AllInOneWidgetProvider : ModuleWidgetProvider()
 
     override fun onUpdate(ctx: Context, mgr: AppWidgetManager, widgetIds: IntArray) {
@@ -59,7 +59,7 @@ open class ModuleWidgetProvider : AppWidgetProvider() {
                 "UptimeWidgetProvider" -> "uptime"
                 "StepWidgetProvider" -> "steps"
                 "SpeedTestWidgetProvider" -> "speedtest"
-                "FapWidgetProvider" -> "fap"
+                "HabitWidgetProvider" -> "habit"
                 "AllInOneWidgetProvider" -> "all_in_one"
                 else -> "battery"
             }
@@ -70,11 +70,10 @@ open class ModuleWidgetProvider : AppWidgetProvider() {
 
             // Header
             if (key == "all_in_one") {
-                views.setTextViewText(R.id.widgetTitle, "📦 All-in-One Status")
+                views.setTextViewText(R.id.widgetTitle, "All-in-One Status")
             } else {
-                val emoji = ModuleRegistry.emojiFor(key)
                 val name = ModuleRegistry.nameFor(key)
-                views.setTextViewText(R.id.widgetTitle, "$emoji  $name")
+                views.setTextViewText(R.id.widgetTitle, name)
             }
 
             // Data
@@ -86,9 +85,8 @@ open class ModuleWidgetProvider : AppWidgetProvider() {
                     if (com.extensionbox.app.Prefs.isModuleEnabled(ctx, mKey, ModuleRegistry.defAt(i))) {
                         val data = MonitorService.getModuleData(mKey)
                         if (data != null && data.isNotEmpty()) {
-                            val emoji = ModuleRegistry.emojiFor(mKey)
                             if (body.isNotEmpty()) body.append("<br>")
-                            body.append("<u>").append(emoji).append(" <b>").append(ModuleRegistry.nameFor(mKey)).append("</b></u><br>")
+                            body.append("<u><b>").append(ModuleRegistry.nameFor(mKey)).append("</b></u><br>")
                             
                             var shown = 0
                             for ((rawKey, value) in data) {
@@ -149,7 +147,7 @@ open class ModuleWidgetProvider : AppWidgetProvider() {
                 UptimeWidgetProvider::class.java,
                 StepWidgetProvider::class.java,
                 SpeedTestWidgetProvider::class.java,
-                FapWidgetProvider::class.java,
+                HabitWidgetProvider::class.java,
                 AllInOneWidgetProvider::class.java
             )
 

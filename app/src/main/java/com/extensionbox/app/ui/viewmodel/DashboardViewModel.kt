@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.extensionbox.app.MonitorService
 import com.extensionbox.app.Prefs
+import com.extensionbox.app.SystemAccess
 import com.extensionbox.app.db.AppDatabase
 import com.extensionbox.app.db.ModuleDataEntity
 import com.extensionbox.app.ui.ModuleRegistry
@@ -106,16 +107,25 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                     val key = ModuleRegistry.keyAt(i)
                     if (Prefs.isModuleEnabled(context, key, ModuleRegistry.defAt(i))) {
                         count++
-                        if (running) {
-                            val moduleData = MonitorService.getModuleData(key)
-                            if (moduleData != null && moduleData.isNotEmpty()) {
-                                dataMap[key] = moduleData
-                                
-                                // Fetch history
-                                val history = database.moduleDataDao().getHistoryList(key, fifteenMinsAgo)
-                                if (history.isNotEmpty()) {
-                                    histMap[key] = history
-                                }
+                        
+                        var mData = MonitorService.getModuleData(key)
+                        
+                        // Special handling for modules that might not have background data yet or at all
+                        if (mData == null && (key == "habit" || key == "privacy")) {
+                            val module = ModuleRegistry.getModule(key)
+                            if (module != null) {
+                                module.start(context, com.extensionbox.app.SystemAccess(context))
+                                mData = module.dataPoints()
+                            }
+                        }
+
+                        if (mData != null && mData.isNotEmpty()) {
+                            dataMap[key] = mData
+                            
+                            // Fetch history
+                            val history = database.moduleDataDao().getHistoryList(key, fifteenMinsAgo)
+                            if (history.isNotEmpty()) {
+                                histMap[key] = history
                             }
                         }
                     }

@@ -1,5 +1,32 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
    >
+    <queries>
+        <!-- Allow querying launcher apps -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <!-- Common popular packages the debloater should be able to see -->
+        <package android:name="com.android.chrome" />
+        <package android:name="com.chrome.beta" />
+        <package android:name="com.chrome.dev" />
+        <package android:name="com.google.android.youtube" />
+        <package android:name="com.google.android.youtube.tv" />
+        <package android:name="com.google.android.apps.youtube.music" />
+        <package android:name="com.google.android.apps.youtube.kids" />
+        <package android:name="com.google.android.gms" />
+        <package android:name="com.google.android.googlequicksearchbox" />
+        <package android:name="com.google.android.apps.maps" />
+        <package android:name="com.zhiliaoapp.musically" />
+        <package android:name="com.ubercab" />
+        <package android:name="com.facebook.katana" />
+        <package android:name="com.instagram.android" />
+        <package android:name="com.snapchat.android" />
+        <package android:name="com.whatsapp" />
+        <package android:name="com.twitter.android" />
+        <package android:name="com.netflix.mediaclient" />
+        <package android:name="com.spotify.music" />
+    </queries>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
 
     
@@ -56,7 +83,7 @@
         <!-- ═══ Module Widgets ═══ -->
         <receiver android:name=".widgets.ModuleWidgetProvider$BatteryWidgetProvider"
             android:exported="true"
-            android:label="🔋 Battery &amp; Screen">
+            android:label="Battery &amp; Screen">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -66,7 +93,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$CpuWidgetProvider"
             android:exported="true"
-            android:label="🧠 CPU">
+            android:label="CPU">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -76,7 +103,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$RamWidgetProvider"
             android:exported="true"
-            android:label="🧠 RAM">
+            android:label="RAM">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -86,7 +113,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$ScreenWidgetProvider"
             android:exported="true"
-            android:label="📱 Screen Time">
+            android:label="Screen Time">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -96,7 +123,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$SleepWidgetProvider"
             android:exported="true"
-            android:label="😴 Deep Sleep">
+            android:label="Deep Sleep">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -106,7 +133,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$NetworkWidgetProvider"
             android:exported="true"
-            android:label="📶 Network Speed">
+            android:label="Network Speed">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -116,7 +143,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$DataWidgetProvider"
             android:exported="true"
-            android:label="📊 Data Usage">
+            android:label="Data Usage">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -126,7 +153,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$UnlockWidgetProvider"
             android:exported="true"
-            android:label="🔓 Unlock Counter">
+            android:label="Unlock Counter">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -136,7 +163,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$StorageWidgetProvider"
             android:exported="true"
-            android:label="💾 Storage">
+            android:label="Storage">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -146,7 +173,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$ConnectionWidgetProvider"
             android:exported="true"
-            android:label="📡 Connection Info">
+            android:label="Connection Info">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -156,7 +183,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$UptimeWidgetProvider"
             android:exported="true"
-            android:label="🕒 Uptime">
+            android:label="Uptime">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -166,7 +193,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$StepWidgetProvider"
             android:exported="true"
-            android:label="👣 Step Counter">
+            android:label="Step Counter">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -176,7 +203,7 @@
 
         <receiver android:name=".widgets.ModuleWidgetProvider$SpeedTestWidgetProvider"
             android:exported="true"
-            android:label="🏎 Speed Test">
+            android:label="Speed Test">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -184,19 +211,19 @@
                 android:resource="@xml/widget_speedtest_info" />
         </receiver>
 
-        <receiver android:name=".widgets.ModuleWidgetProvider$FapWidgetProvider"
+        <receiver android:name=".widgets.ModuleWidgetProvider$HabitWidgetProvider"
             android:exported="true"
-            android:label="🍆 Fap Counter">
+            android:label="Habit Tracker">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
-                android:resource="@xml/widget_fap_info" />
+                android:resource="@xml/widget_habit_info" />
         </receiver>
 
         <receiver android:name=".widgets.ModuleWidgetProvider$AllInOneWidgetProvider"
             android:exported="true"
-            android:label="📦 All-in-One Status">
+            android:label="All-in-One Status">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

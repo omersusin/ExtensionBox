@@ -33,11 +33,11 @@ class NetworkModule : Module {
 
     override fun key(): String = "network"
     override fun name(): String = ctx?.getString(R.string.network_module_name) ?: "Network Speed"
-    override fun emoji(): String = "📶"
     override fun description(): String = ctx?.getString(R.string.network_module_description) ?: "Real-time download and upload speed"
     override fun defaultEnabled(): Boolean = true
     override fun alive(): Boolean = running
     override fun priority(): Int = 40
+    override fun hasSettings(): Boolean = true
 
     override fun tickIntervalMs(): Int = ctx?.let { Prefs.getInt(it, "net_interval", 3000) } ?: 3000
 
@@ -69,6 +69,9 @@ class NetworkModule : Module {
         ulSpeed = 0
         sys = null
     }
+
+    fun getDlSpeed(): Long = dlSpeed
+    fun getUlSpeed(): Long = ulSpeed
 
     override fun tick() {
         val now = SystemClock.elapsedRealtime()
@@ -139,7 +142,7 @@ class NetworkModule : Module {
             sb.append("\n   Active Interfaces:\n")
             activeIfaces.forEach { (name, stats) ->
                 sb.append("   • $name:\n")
-                sb.append("     RX: ${Fmt.bytes(stats.first)} | TX: ${Fmt.bytes(stats.second)}\n")
+                sb.append("     RX: ${Fmt.bytes(stats.first)} • TX: ${Fmt.bytes(stats.second)}\n")
             }
         }
         return sb.toString().trim()

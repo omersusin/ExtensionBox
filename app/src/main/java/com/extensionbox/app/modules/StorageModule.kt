@@ -36,11 +36,11 @@ class StorageModule : Module {
 
     override fun key(): String = "storage"
     override fun name(): String = ctx?.getString(R.string.storage_module_name) ?: "Storage"
-    override fun emoji(): String = "💾"
     override fun description(): String = ctx?.getString(R.string.storage_module_description) ?: "Internal storage usage"
     override fun defaultEnabled(): Boolean = false
     override fun alive(): Boolean = running
     override fun priority(): Int = 85
+    override fun hasSettings(): Boolean = true
 
     override fun tickIntervalMs(): Int = ctx?.let { Prefs.getInt(it, "sto_interval", 10000) } ?: 10000
 

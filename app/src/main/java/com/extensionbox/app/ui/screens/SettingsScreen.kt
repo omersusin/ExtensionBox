@@ -268,7 +268,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
 
                 var layoutExpanded by remember { mutableStateOf(false) }
-                var layoutStyle by remember { mutableStateOf(Prefs.getString(context, "notif_layout_style", "LIST") ?: "LIST") }
+                var layoutStyle by remember { mutableStateOf(Prefs.getString(context, "notif_layout_style", "PUZZLE") ?: "PUZZLE") }
                 
                 SettingsItem(
                     title = stringResource(id = R.string.layout_style),
@@ -278,7 +278,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 )
                 
                 DropdownMenu(expanded = layoutExpanded, onDismissRequest = { layoutExpanded = false }) {
-                    listOf("LIST", "GRID", "COMPACT").forEach { style ->
+                    listOf("PUZZLE", "LIST", "GRID").forEach { style ->
                         DropdownMenuItem(
                             text = { Text(style) },
                             onClick = {
@@ -403,40 +403,6 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                         Prefs.setBool(context, "notif_context_aware", it)
                     }
                 )
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
-
-                var notifCompact by remember { mutableStateOf(Prefs.getBool(context, "notif_compact_style", true)) }
-                SettingsToggle(
-                    title = stringResource(id = R.string.compact_style),
-                    summary = stringResource(id = R.string.simplified_list_in_notification),
-                    icon = Icons.Default.Compress,
-                    checked = notifCompact,
-                    onCheckedChange = {
-                        notifCompact = it
-                        Prefs.setBool(context, "notif_compact_style", it)
-                    }
-                )
-                
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
-
-                var compactItems by remember { mutableStateOf(Prefs.getInt(context, "notif_compact_items", 4).toFloat()) }
-                Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                    Text(
-                        text = stringResource(id = R.string.notification_items, compactItems.toInt()),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Slider(
-                        value = compactItems,
-                        onValueChange = { 
-                            compactItems = it
-                            Prefs.setInt(context, "notif_compact_items", it.toInt())
-                        },
-                        valueRange = 1f..6f,
-                        steps = 4
-                    )
-                }
             }
         }
 

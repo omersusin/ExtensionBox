@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,7 +35,8 @@ import com.extensionbox.app.ui.viewmodel.ExtensionsViewModel
 @Composable
 fun ExtensionsScreen(
     viewModel: ExtensionsViewModel = viewModel(),
-    onModuleClick: (String) -> Unit
+    onModuleClick: (String) -> Unit,
+    onDebloatClick: () -> Unit
 ) {
     val context = LocalContext.current
     val moduleStates by viewModel.moduleStates.collectAsState()
@@ -44,6 +46,48 @@ fun ExtensionsScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        item {
+            AppCard(
+                onClick = onDebloatClick,
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Debloat Apps",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = "Remove bloatware and unwanted apps",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+
         itemsIndexed((0 until ModuleRegistry.count()).toList()) { index, _ ->
             val key = ModuleRegistry.keyAt(index)
             val icon = ModuleRegistry.iconAt(index)

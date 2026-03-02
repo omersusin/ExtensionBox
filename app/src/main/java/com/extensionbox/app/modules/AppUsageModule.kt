@@ -31,11 +31,11 @@ class AppUsageModule : Module {
 
     override fun key(): String = "app_usage"
     override fun name(): String = ctx?.getString(R.string.app_usage_module_name) ?: "App Usage"
-    override fun emoji(): String = "📱"
     override fun description(): String = ctx?.getString(R.string.app_usage_module_description) ?: "Time spent in each application"
     override fun defaultEnabled(): Boolean = true
     override fun alive(): Boolean = running
     override fun priority(): Int = 22
+    override fun hasSettings(): Boolean = true
 
     override fun tickIntervalMs(): Int = ctx?.let { Prefs.getInt(it, "usage_interval", 30000) } ?: 30000
 
