@@ -152,6 +152,12 @@
     <string name="battery_module_screen_time_limit_content">Screen on for %1$s. Take a break!</string>
     <string name="battery_module_abnormal_discharge_title">Abnormal Discharge</string>
     <string name="battery_module_abnormal_discharge_content">Battery dropped %1$d%% in last 15 mins!</string>
+    <string name="battery_module_charger_type">Charger Type</string>
+    <string name="battery_module_discharge_rate">Discharge Rate</string>
+    <string name="battery_module_charge_current">Charge Current</string>
+    <string name="battery_module_plugged_ac">AC Adapter</string>
+    <string name="battery_module_plugged_usb">USB Port</string>
+    <string name="battery_module_plugged_wireless">Wireless</string>
     <string name="battery_module_not_available">—</string>
     <string name="battery_module_full_in">Full in %1$s</string>
     <string name="battery_module_time_left">%1$s left</string>

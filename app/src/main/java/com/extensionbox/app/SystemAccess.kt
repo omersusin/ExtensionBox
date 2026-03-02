@@ -380,6 +380,15 @@ class SystemAccess(ctx: Context) {
         }
     }
 
+    fun readRemainingCapacity(ctx: Context): Int {
+        return try {
+            val bm = ctx.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CHARGE_COUNTER) / 1000
+        } catch (e: Exception) {
+            -1
+        }
+    }
+
     fun readActualCapacity(): Int {
         if (!isEnhanced()) return -1
         val valStr = readSysFile("/sys/class/power_supply/battery/charge_full") ?: return -1
