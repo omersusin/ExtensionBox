@@ -42,6 +42,16 @@ class SleepModule : Module {
 
     override fun tick() {}
 
+    fun getDeepSleepMs(): Long {
+        val el = SystemClock.elapsedRealtime() - elapsedStart
+        val up = SystemClock.uptimeMillis() - uptimeStart
+        return max(0, el - up)
+    }
+    
+    fun getAwakeMs(): Long {
+        return SystemClock.uptimeMillis() - uptimeStart
+    }
+
     private fun deepPct(): Float {
         val el = SystemClock.elapsedRealtime() - elapsedStart
         val up = SystemClock.uptimeMillis() - uptimeStart

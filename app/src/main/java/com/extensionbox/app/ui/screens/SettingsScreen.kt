@@ -268,7 +268,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
 
                 var layoutExpanded by remember { mutableStateOf(false) }
-                var layoutStyle by remember { mutableStateOf(Prefs.getString(context, "notif_layout_style", "LIST") ?: "LIST") }
+                var layoutStyle by remember { mutableStateOf(Prefs.getString(context, "notif_layout_style", "PUZZLE") ?: "PUZZLE") }
                 
                 SettingsItem(
                     title = stringResource(id = R.string.layout_style),
@@ -278,7 +278,7 @@ fun SettingsScreen(viewModel: SettingsViewModel = viewModel()) {
                 )
                 
                 DropdownMenu(expanded = layoutExpanded, onDismissRequest = { layoutExpanded = false }) {
-                    listOf("LIST", "GRID").forEach { style ->
+                    listOf("PUZZLE", "LIST", "GRID").forEach { style ->
                         DropdownMenuItem(
                             text = { Text(style) },
                             onClick = {

@@ -554,14 +554,36 @@ class BatteryModule : Module {
 
     fun isFull(): Boolean = status == BatteryManager.BATTERY_STATUS_FULL || level >= 100
 
-    private fun isCharging(): Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
+    fun isCharging(): Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
+    
+    fun getCurrentMa(): Int = currentMa
+    
+    fun getVoltage(): Int = voltage
+    
+    fun getTemp(): Int = temp
+    
+    fun getTimeLeft(): String = timeLeft()
+    
+    fun getOnDrain(): Float = onDrain
+    
+    fun getOffDrain(): Float = offDrain
+    
+    fun getOnAccMs(): Long = onAccMs
+    
+    fun getOffAccMs(): Long = offAccMs
+    
+    fun getPeriodStartLevel(): Int = periodStartLevel
+    
+    fun getPeriodStart(): Long = periodStart
+    
+    fun isScreenOn(): Boolean = screenOn
 
-    private fun getTotalOn(): Long {
+    fun getTotalOn(): Long {
         val now = android.os.SystemClock.elapsedRealtime()
         return onAccMs + if (screenOn) (now - periodStart) else 0
     }
 
-    private fun getTotalOff(): Long {
+    fun getTotalOff(): Long {
         val now = android.os.SystemClock.elapsedRealtime()
         return offAccMs + if (!screenOn) (now - periodStart) else 0
     }

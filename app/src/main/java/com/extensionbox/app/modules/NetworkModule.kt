@@ -70,6 +70,9 @@ class NetworkModule : Module {
         sys = null
     }
 
+    fun getDlSpeed(): Long = dlSpeed
+    fun getUlSpeed(): Long = ulSpeed
+
     override fun tick() {
         val now = SystemClock.elapsedRealtime()
         val dtMs = now - prevTime

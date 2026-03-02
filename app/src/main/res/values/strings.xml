@@ -23,6 +23,7 @@
     <string name="lead_developer">Lead Developer • Kotlin &amp; Shizuku</string>
     <string name="omer">Omer</string>
     <string name="contributor">Contributor</string>
+    <string name="juanma">Juan Ma</string>
     <string name="data_usage_module_name">Data Usage</string>
     <string name="data_usage_module_description">Daily &amp; monthly, WiFi &amp; mobile</string>
     <string name="data_usage_module_compact_text">%1$s</string>
@@ -308,6 +309,7 @@
     <string name="dismissible">Dismissible</string>
     <string name="allow_swiping_away_to_stop_service">Allow swiping away to stop service</string>
     <string name="layout_style">Layout Style</string>
+    <string name="puzzle" translatable="false">PUZZLE</string>
     <string name="list" translatable="false">LIST</string>
     <string name="grid" translatable="false">GRID</string>
     <string name="visible_modules">Visible Modules</string>

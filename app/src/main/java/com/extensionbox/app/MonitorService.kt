@@ -16,6 +16,7 @@ import kotlinx.coroutines.*
 import com.extensionbox.app.db.AppDatabase
 import com.extensionbox.app.db.ModuleDataEntity
 import java.util.Calendar
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
@@ -430,8 +431,12 @@ class MonitorService : Service() {
 
     private fun buildExpanded(alive: List<Module>): String {
         if (!::modules.isInitialized) return "Starting..."
-        val layoutStyle = Prefs.getString(this, "notif_layout_style", "LIST") ?: "LIST"
+        val layoutStyle = Prefs.getString(this, "notif_layout_style", "PUZZLE") ?: "PUZZLE"
         
+        if (layoutStyle == "PUZZLE") {
+            return buildPuzzleLayout(alive)
+        }
+
         if (alive.isEmpty()) return "Enable extensions to see stats"
 
         return when (layoutStyle) {
@@ -452,6 +457,82 @@ class MonitorService : Service() {
                 alive.map { m -> "${m.name()}: ${m.compact()}" }.joinToString("\n")
             }
         }
+    }
+
+    private fun buildPuzzleLayout(alive: List<Module>): String {
+        val sb = StringBuilder()
+        val bat = modules.filterIsInstance<BatteryModule>().firstOrNull()
+        val slp = modules.filterIsInstance<SleepModule>().firstOrNull()
+        val net = modules.filterIsInstance<NetworkModule>().firstOrNull()
+
+        if (bat != null && bat.alive()) {
+            val ma = abs(bat.getCurrentMa())
+            val w = ma * bat.getVoltage() / 1_000_000f
+            val t = bat.getTemp() / 10f
+            val timeLeft = bat.getTimeLeft()
+            
+            // Now: 110 mA (0.5 W) • 37.0º • 3d 18h left
+            sb.append("Now: ").append(ma).append(" mA (")
+                .append(String.format(Locale.US, "%.1f W", w)).append(") • ")
+                .append(String.format(Locale.US, "%.1fº", t)).append(" • ")
+                .append(timeLeft).append("\n")
+
+            val on = bat.getTotalOn()
+            val off = bat.getTotalOff()
+            
+            if (on > 60000) {
+                val curOnDrain = if (bat.isScreenOn()) abs(bat.getPeriodStartLevel() - bat.getLevel()).toFloat() else 0f
+                val totalOnDrain = bat.getOnDrain() + curOnDrain
+                val rateOn = totalOnDrain / (on / 3600000f)
+                
+                val curOffDrain = if (!bat.isScreenOn()) abs(bat.getPeriodStartLevel() - bat.getLevel()).toFloat() else 0f
+                val totalOffDrain = bat.getOffDrain() + curOffDrain
+                val rateOff = if (off > 60000) totalOffDrain / (off / 3600000f) else 0f
+                
+                // Active: 0.0%/h • Idle: 0.0%/h
+                sb.append("Active: ").append(String.format(Locale.US, "%.1f%%/h", rateOn))
+                    .append(" • Idle: ").append(String.format(Locale.US, "%.1f%%/h", rateOff)).append("\n")
+                
+                // Screen On: 48s • 0.0% (5 mAh)
+                val design = sysAccess.readDesignCapacity(this)
+                val mahOn = (totalOnDrain * design / 100).toInt()
+                sb.append("Screen On: ").append(Fmt.duration(on)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", totalOnDrain)).append(" (")
+                    .append(mahOn).append(" mAh)\n")
+                
+                // Screen Off: 22s • 0.0% (1 mAh)
+                val mahOff = (totalOffDrain * design / 100).toInt()
+                sb.append("Screen Off: ").append(Fmt.duration(off)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", totalOffDrain)).append(" (")
+                    .append(mahOff).append(" mAh)\n")
+            }
+        }
+
+        if (slp != null && slp.alive()) {
+            val ds = slp.getDeepSleepMs()
+            val up = slp.getAwakeMs()
+            val total = ds + up
+            if (total > 0) {
+                val dsPct = ds * 100f / total
+                val upPct = up * 100f / total
+                // Deep sleep: 16s • 72.9%
+                sb.append("Deep sleep: ").append(Fmt.duration(ds)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", dsPct)).append("\n")
+                // Awake: 5s • 27.1%
+                sb.append("Awake: ").append(Fmt.duration(up)).append(" • ")
+                    .append(String.format(Locale.US, "%.1f%%", upPct)).append("\n")
+            }
+        }
+
+        if (net != null && net.alive()) {
+            val dl = net.getDlSpeed()
+            val ul = net.getUlSpeed()
+            // Download: 1.5 MB/s • Upload 0.4 MB/s
+            sb.append("Download: ").append(Fmt.speed(dl)).append(" • Upload ")
+                .append(Fmt.speed(ul))
+        }
+
+        return sb.toString().trim()
     }
 
     private fun getAliveModulesSorted(): List<Module> {
